@@ -8,6 +8,7 @@
 [![Next.js 15](https://img.shields.io/badge/Framework-Next.js%2015%20App%20Router-blue.svg)](https://nextjs.org)
 [![PyTorch ONNX](https://img.shields.io/badge/ML%20Engine-ONNX%20Runtime%20Node-purple.svg)](https://onnxruntime.ai)
 [![Dataset](https://img.shields.io/badge/Data-Mendeley%20DOI%2010.17632%2Fmwmhh766fc-orange.svg)](https://doi.org/10.17632/mwmhh766fc)
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/MFDoom151/freshstream-ai)
 
 ---
 
