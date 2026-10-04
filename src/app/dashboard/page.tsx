@@ -9,6 +9,7 @@ import { ShipmentItem } from '@/types/shipment';
 import { QuickStats } from '@/components/dashboard/QuickStats';
 import { AlertsWidget } from '@/components/dashboard/AlertsWidget';
 import { ShipmentsTable } from '@/components/dashboard/ShipmentsTable';
+import { DigitalTwinMapDynamic } from '@/components/map/DigitalTwinMapDynamic';
 import { Activity, ShieldCheck, Radio } from 'lucide-react';
 
 export default function DashboardPage() {
@@ -76,7 +77,28 @@ export default function DashboardPage() {
           <QuickStats shipments={shipments} />
         </div>
 
-        {/* Section 2: Real-Time Alerts Widget */}
+        {/* Section 2: Real-World Digital Twin Geospatial Command Center */}
+        <div className="mt-8 flex flex-col gap-3">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+              <div className="flex items-center gap-2">
+                <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
+                  Trans-Caspian Bio-Digital Twin Command Canvas
+                </h2>
+                <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+                  REAL GIS TELEMETRY
+                </span>
+              </div>
+              <p className="text-xs sm:text-sm text-slate-400 mt-0.5">
+                Active reefer rail & ro-pax vessels, critical temperature excursions, and bio-degradation events plotted over real geospatial terrain.
+              </p>
+            </div>
+          </div>
+
+          <DigitalTwinMapDynamic shipments={shipments} />
+        </div>
+
+        {/* Section 3: Real-Time Alerts Widget */}
         <div className="mt-8">
           <AlertsWidget shipments={shipments} />
         </div>

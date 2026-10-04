@@ -107,13 +107,9 @@ export const MiddleCorridorMap: React.FC<MiddleCorridorMapProps> = ({
             </linearGradient>
 
             <linearGradient id="blackSeaGrad" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stopColor="#1e3a8a" stopOpacity="0.18" />
-              <stop offset="100%" stopColor="#1e40af" stopOpacity="0.08" />
+              <stop offset="0%" stopColor="#1e3a8a" stopOpacity="0.12" />
+              <stop offset="100%" stopColor="#1e40af" stopOpacity="0.04" />
             </linearGradient>
-
-            <filter id="corridorGlow" x="-20%" y="-20%" width="140%" height="140%">
-              <feDropShadow dx="0" dy="0" stdDeviation="3" floodColor="#10b981" floodOpacity="0.6" />
-            </filter>
           </defs>
 
           {/* Sea water regions (Decorative geographic backdrops) */}

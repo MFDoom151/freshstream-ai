@@ -69,12 +69,12 @@ const config: Config = {
         '2xl': '40px',
       },
       boxShadow: {
-        'glass-card': '0 8px 32px 0 rgba(0, 0, 0, 0.37)',
-        'mint-glow': '0 0 25px rgba(16, 185, 129, 0.25)',
-        'mint-glow-lg': '0 0 45px rgba(16, 185, 129, 0.35)',
-        'cyber-glow': '0 0 25px rgba(139, 92, 246, 0.25)',
-        'cyber-glow-lg': '0 0 45px rgba(139, 92, 246, 0.35)',
-        'danger-glow': '0 0 25px rgba(239, 68, 68, 0.35)',
+        'glass-card': '0 4px 16px -2px rgba(0, 0, 0, 0.4)',
+        'mint-glow': '0 0 10px rgba(16, 185, 129, 0.15)',
+        'mint-glow-lg': '0 0 16px rgba(16, 185, 129, 0.20)',
+        'cyber-glow': '0 0 10px rgba(99, 102, 241, 0.15)',
+        'cyber-glow-lg': '0 0 16px rgba(99, 102, 241, 0.20)',
+        'danger-glow': '0 0 10px rgba(239, 68, 68, 0.20)',
       },
       animation: {
         'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',

@@ -75,24 +75,23 @@ export const Header: React.FC = () => {
               className="flex items-center gap-2.5 group focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 rounded-lg p-1"
               aria-label="FreshStream AI Homepage"
             >
-              <div className="relative flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500/20 to-purple-500/20 border border-emerald-500/30 group-hover:border-emerald-400 transition-colors shadow-[0_0_15px_rgba(16,185,129,0.2)]">
-                <Activity className="w-5 h-5 text-emerald-400 transition-transform group-hover:scale-110" />
-                <span className="absolute -top-1 -right-1 flex h-2.5 w-2.5">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                  <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500" />
+              <div className="relative flex items-center justify-center w-9 h-9 rounded-lg bg-slate-900 border border-slate-700/80 group-hover:border-emerald-500/60 transition-colors">
+                <Activity className="w-4 h-4 text-emerald-400" />
+                <span className="absolute top-1 right-1 flex h-1.5 w-1.5">
+                  <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-400" />
                 </span>
               </div>
               <div className="flex flex-col">
-                <div className="flex items-center">
-                  <span className="text-xl font-bold tracking-tight text-white dark:text-white light:text-slate-900">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-lg font-bold tracking-tight text-white dark:text-white light:text-slate-900">
                     FreshStream
                   </span>
-                  <span className="ml-1 text-[11px] font-black tracking-wider uppercase px-1.5 py-0.5 rounded bg-gradient-to-r from-emerald-400 to-cyan-400 text-slate-950 shadow-sm">
-                    AI
+                  <span className="text-[10px] font-mono font-bold tracking-wider uppercase px-1.5 py-0.5 rounded bg-slate-800 text-emerald-400 border border-slate-700">
+                    TWIN-OS
                   </span>
                 </div>
-                <span className="text-[10px] text-slate-400 tracking-wider hidden sm:block">
-                  Biological Digital Twin
+                <span className="text-[10px] text-slate-400 tracking-wider font-mono hidden sm:block">
+                  Trans-Caspian Bio-Digital Twin
                 </span>
               </div>
             </Link>
@@ -117,23 +116,17 @@ export const Header: React.FC = () => {
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`relative px-3 py-1.5 rounded-lg text-xs xl:text-sm font-medium transition-all duration-200 flex items-center gap-1.5 ${
+                  className={`relative px-3 py-1.5 rounded-lg text-xs xl:text-sm font-medium transition-all duration-150 flex items-center gap-1.5 ${
                     isActive
-                      ? 'text-emerald-400 bg-emerald-500/10 shadow-[0_0_10px_rgba(16,185,129,0.15)] font-semibold'
-                      : 'text-slate-300 hover:text-white hover:bg-slate-800/50 light:text-slate-700 light:hover:text-slate-900 light:hover:bg-slate-100'
+                      ? 'text-emerald-400 bg-slate-900 border border-slate-700/80 font-semibold'
+                      : 'text-slate-300 hover:text-white hover:bg-slate-800/60 light:text-slate-700 light:hover:text-slate-900 light:hover:bg-slate-100'
                   }`}
                 >
                   {link.label}
                   {link.isLive && (
-                    <Badge variant="mint" size="sm" dot>
+                    <span className="px-1.5 py-0.5 text-[9px] font-mono font-bold rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
                       LIVE
-                    </Badge>
-                  )}
-                  {isActive && (
-                    <span 
-                      aria-hidden="true"
-                      className="absolute bottom-0 left-2 right-2 h-0.5 bg-emerald-400 rounded-full" 
-                    />
+                    </span>
                   )}
                 </Link>
               );

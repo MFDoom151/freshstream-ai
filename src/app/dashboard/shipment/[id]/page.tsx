@@ -8,6 +8,7 @@ import { GlassCard } from '@/components/ui/GlassCard';
 import { Badge } from '@/components/ui/Badge';
 import { Button } from '@/components/ui/Button';
 import { ControlTower } from '@/components/simulator/ControlTower';
+import { DigitalTwinMapDynamic } from '@/components/map/DigitalTwinMapDynamic';
 import { getShipmentById, INITIAL_SHIPMENTS } from '@/lib/shipments-data';
 import { useI18n } from '@/lib/i18n/context';
 import { 
@@ -160,6 +161,29 @@ export default function ShipmentDetailPage({ params }: ShipmentPageProps) {
               </div>
             </div>
           </GlassCard>
+        </div>
+
+        {/* Real-World Digital Twin Map View for This Shipment */}
+        <div className="mt-8 flex flex-col gap-3">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <h3 className="text-lg font-bold text-white tracking-tight">
+                Geospatial Asset Twin & Corridor Waypoints
+              </h3>
+              <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-slate-800 text-cyan-300 border border-slate-700">
+                LIVE GPS TRACE
+              </span>
+            </div>
+            <span className="text-xs font-mono text-slate-400">
+              Tracking: <strong className="text-white">{shipment.id}</strong> ({shipment.waypointName})
+            </span>
+          </div>
+
+          <DigitalTwinMapDynamic 
+            shipments={INITIAL_SHIPMENTS} 
+            highlightShipmentId={shipment.id} 
+            className="h-[480px] sm:h-[540px]" 
+          />
         </div>
 
         {/* Relocated ControlTower Simulator for Detailed Telemetry & AI Conductor */}
