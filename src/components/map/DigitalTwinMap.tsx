@@ -44,22 +44,31 @@ interface DigitalTwinMapProps {
   className?: string;
 }
 
+interface BasemapConfig {
+  url: string;
+  refUrl?: string;
+  attribution: string;
+  maxZoom: number;
+}
+
 type BasemapStyle = 'dark' | 'satellite' | 'positron';
 
-const BASEMAP_TILES: Record<BasemapStyle, { url: string; attribution: string; maxZoom: number }> = {
+const BASEMAP_TILES: Record<BasemapStyle, BasemapConfig> = {
   dark: {
-    url: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-    maxZoom: 19,
+    url: 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',
+    refUrl: 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}',
+    attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ',
+    maxZoom: 16,
   },
   satellite: {
     url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-    attribution: 'Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community',
+    refUrl: 'https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}',
+    attribution: 'Tiles &copy; Esri &mdash; DigitalGlobe, GeoEye, Earthstar Geographics',
     maxZoom: 18,
   },
   positron: {
-    url: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+    url: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     maxZoom: 19,
   },
 };
@@ -72,6 +81,7 @@ export const DigitalTwinMap: React.FC<DigitalTwinMapProps> = ({
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapInstanceRef = useRef<any>(null);
   const tileLayerRef = useRef<any>(null);
+  const refTileLayerRef = useRef<any>(null);
   const layersGroupRef = useRef<{
     routes: any;
     hubs: any;
@@ -128,13 +138,18 @@ export const DigitalTwinMap: React.FC<DigitalTwinMapProps> = ({
       // Add Zoom control to bottom-right
       L.control.zoom({ position: 'bottomright' }).addTo(map);
 
-      // Add Base Tile Layer
+      // Add Base Tile Layer & optional Reference Labels Overlay
       const baseCfg = BASEMAP_TILES[basemap];
       tileLayerRef.current = L.tileLayer(baseCfg.url, {
         attribution: baseCfg.attribution,
         maxZoom: baseCfg.maxZoom,
-        subdomains: 'abcd',
       }).addTo(map);
+
+      if (baseCfg.refUrl) {
+        refTileLayerRef.current = L.tileLayer(baseCfg.refUrl, {
+          maxZoom: baseCfg.maxZoom,
+        }).addTo(map);
+      }
 
       // Track mouse coordinates
       map.on('mousemove', (e: any) => {
@@ -164,6 +179,14 @@ export const DigitalTwinMap: React.FC<DigitalTwinMapProps> = ({
 
     return () => {
       isCancelled = true;
+      if (tileLayerRef.current && mapInstanceRef.current) {
+        mapInstanceRef.current.removeLayer(tileLayerRef.current);
+        tileLayerRef.current = null;
+      }
+      if (refTileLayerRef.current && mapInstanceRef.current) {
+        mapInstanceRef.current.removeLayer(refTileLayerRef.current);
+        refTileLayerRef.current = null;
+      }
       if (mapInstanceRef.current) {
         mapInstanceRef.current.remove();
         mapInstanceRef.current = null;
@@ -174,16 +197,28 @@ export const DigitalTwinMap: React.FC<DigitalTwinMapProps> = ({
 
   // Update Base Tile on state change
   useEffect(() => {
-    if (!mapInstanceRef.current || !tileLayerRef.current) return;
+    if (!mapInstanceRef.current) return;
+    if (tileLayerRef.current) {
+      mapInstanceRef.current.removeLayer(tileLayerRef.current);
+      tileLayerRef.current = null;
+    }
+    if (refTileLayerRef.current) {
+      mapInstanceRef.current.removeLayer(refTileLayerRef.current);
+      refTileLayerRef.current = null;
+    }
     const baseCfg = BASEMAP_TILES[basemap];
-    mapInstanceRef.current.removeLayer(tileLayerRef.current);
     import('leaflet').then((LModule) => {
       const L = LModule.default;
       tileLayerRef.current = L.tileLayer(baseCfg.url, {
         attribution: baseCfg.attribution,
         maxZoom: baseCfg.maxZoom,
-        subdomains: 'abcd',
       }).addTo(mapInstanceRef.current);
+
+      if (baseCfg.refUrl) {
+        refTileLayerRef.current = L.tileLayer(baseCfg.refUrl, {
+          maxZoom: baseCfg.maxZoom,
+        }).addTo(mapInstanceRef.current);
+      }
     });
   }, [basemap]);
 

@@ -20,7 +20,7 @@ const DynamicMap = dynamic(() => import('./DigitalTwinMap'), {
         <span className="text-white font-bold tracking-wider">INITIALIZING DIGITAL TWIN CANVASES</span>
       </div>
       <p className="text-slate-500 text-[11px]">
-        Loading CartoDB Dark Matter GIS tiles, Corridor Waypoints & IoT Mesh...
+        Loading Esri Dark Gray GIS tiles, Corridor Waypoints & IoT Mesh...
       </p>
     </div>
   ),
