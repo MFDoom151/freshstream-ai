@@ -1,0 +1,85 @@
+# =========================================================================
+# FreshStream AI — Render Blueprint Specification (render.yaml)
+# =========================================================================
+# Docs: https://render.com/docs/blueprint-spec
+#
+# Deploy using 1-Click Blueprint:
+# 1. Push this repository to GitHub
+# 2. Go to https://dashboard.render.com/blueprints
+# 3. Click "New Blueprint Instance" and connect your repository.
+
+services:
+  # ── 1. Next.js 15 Full-Stack SaaS Web Service (Docker Runtime) ──
+  - type: web
+    name: freshstream-web
+    env: docker
+    plan: free
+    region: oregon # or frankfurt, ohio, singapore
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /
+    autoDeploy: true
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NEXT_TELEMETRY_DISABLED
+        value: "1"
+      - key: DATABASE_URL
+        value: file:/app/prisma/dev.db
+      - key: NEXTAUTH_SECRET
+        generateValue: true
+      - key: NEXTAUTH_URL
+        sync: false # Set to your Render URL (e.g. https://freshstream-web.onrender.com)
+      - key: PORT
+        value: "3000"
+      - key: TELEGRAM_BOT_TOKEN
+        sync: false # Optional Telegram Bot API token
+      - key: TELEGRAM_CHAT_ID
+        sync: false # Optional Telegram destination chat ID
+
+  # ── 2. (Optional) IoT Telemetry Stream Emulator (Background Worker) ──
+  # Note: Background workers require a Render Starter instance ($7/mo).
+  # Uncomment below if running on a paid plan:
+  #
+  # - type: worker
+  #   name: freshstream-emulator
+  #   env: docker
+  #   plan: starter
+  #   dockerfilePath: ./Dockerfile.emulator
+  #   dockerContext: .
+  #   autoDeploy: true
+  #   envVars:
+  #     - key: NODE_ENV
+  #       value: production
+  #     - key: BACKEND_URL
+  #       fromService:
+  #         type: web
+  #         name: freshstream-web
+  #         property: host
+  #     - key: INTERVAL_MS
+  #       value: "2000"
+  #     - key: SHIPMENT_ID
+  #       value: "FS-8821"
+
+  # ── 3. (Optional) Telegram AI Conductor Alert Bot (Background Worker) ──
+  # Uncomment below if running on a paid plan:
+  #
+  # - type: worker
+  #   name: freshstream-tg-bot
+  #   env: docker
+  #   plan: starter
+  #   dockerfilePath: ./tg-bot/Dockerfile
+  #   dockerContext: ./tg-bot
+  #   autoDeploy: true
+  #   envVars:
+  #     - key: NODE_ENV
+  #       value: production
+  #     - key: BACKEND_URL
+  #       fromService:
+  #         type: web
+  #         name: freshstream-web
+  #         property: host
+  #     - key: TELEGRAM_BOT_TOKEN
+  #       sync: false
+  #     - key: TELEGRAM_CHAT_ID
+  #       sync: false

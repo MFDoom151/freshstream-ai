@@ -1,0 +1,348 @@
+import { PrismaClient } from '@prisma/client';
+import bcrypt from 'bcryptjs';
+
+const prisma = new PrismaClient();
+
+const INITIAL_SHIPMENTS_SEED = [
+  {
+    id: 'FS-8821',
+    cargo: 'beef',
+    cargoNameEn: 'KazBeef Organic Beef',
+    exporter: 'KazBeef Processing LLP',
+    carrier: 'KTZ Express / ADY Multimodal',
+    origin: 'Astana, Kazakhstan',
+    destination: 'Dubai Logistics City, UAE',
+    currentWaypoint: 'kuryk',
+    waypointName: 'Port Kuryk Ferry Terminal',
+    assetValueUsd: 72000,
+    departureDate: '2026-09-24',
+    eta: '2026-10-06 (7 Days)',
+    bhi: 96.5,
+    predictedRulHours: 440,
+    status: 'OPTIMAL',
+    telemetry: {
+      temperature: 2.2,
+      humidity: 85,
+      ethanol: 4.2,
+      vibration: 0.3,
+    },
+  },
+  {
+    id: 'FS-9042',
+    cargo: 'berries',
+    cargoNameEn: 'Altyn Dan Fresh Berries',
+    exporter: 'Altyn Dan Agro Holdings',
+    carrier: 'Caspian Bosphorus Reefer Line',
+    origin: 'Almaty Agri-Valley, Kazakhstan',
+    destination: 'Baku Agromarket, Azerbaijan',
+    currentWaypoint: 'kuryk',
+    waypointName: 'Port Kuryk Rail-Ferry Buffer',
+    assetValueUsd: 48000,
+    departureDate: '2026-09-26',
+    eta: '2026-09-30 (1.5 Days)',
+    bhi: 48.2,
+    predictedRulHours: 28,
+    status: 'CRITICAL',
+    telemetry: {
+      temperature: 7.8,
+      humidity: 91,
+      ethanol: 38.4,
+      vibration: 0.8,
+    },
+    alert: {
+      severity: 'CRITICAL',
+      message: 'Volatile ethanol spike (38.4 ppm > 35 ppm threshold) detected at Port Kuryk rail-to-ferry transition. Accelerated fermentation underway.',
+      timestamp: '12 min ago',
+      action: 'Emergency cooling injection & priority ro-ro ferry boarding or immediate local cold storage transfer.',
+      location: 'Port Kuryk Staging Buffer',
+    },
+  },
+  {
+    id: 'FS-4103',
+    cargo: 'dairy',
+    cargoNameEn: 'Saumal Bio-Kefir & Dairy',
+    exporter: 'Eurasia Bio-Dairy LLC',
+    carrier: 'Georgian Railways / Silk Road Trans',
+    origin: 'Kostanay Region, Kazakhstan',
+    destination: 'Poti Sea Port Terminal, Georgia',
+    currentWaypoint: 'baku',
+    waypointName: 'Port of Baku (Alat Hub)',
+    assetValueUsd: 36000,
+    departureDate: '2026-09-22',
+    eta: '2026-10-02 (3.5 Days)',
+    bhi: 68.4,
+    predictedRulHours: 72,
+    status: 'WARNING',
+    telemetry: {
+      temperature: 5.6,
+      humidity: 79,
+      ethanol: 16.2,
+      vibration: 0.6,
+    },
+    alert: {
+      severity: 'WARNING',
+      message: 'Thermal drift detected during Caspian Sea crossing. Reefer ambient temperature elevated to +5.6°C.',
+      timestamp: '42 min ago',
+      action: 'Switch secondary auxiliary compressor cycle and verify shore-power receptacle at Alat terminal.',
+      location: 'Port of Baku, Caspian Anchorage',
+    },
+  },
+  {
+    id: 'FS-6218',
+    cargo: 'fruits',
+    cargoNameEn: 'Tian Shan Organic Apples & Cherries',
+    exporter: 'Zhetysu Orchards Consortium',
+    carrier: 'Trans-Caucasus Intermodal',
+    origin: 'Shymkent, Kazakhstan',
+    destination: 'Istanbul Distribution Center, Turkey',
+    currentWaypoint: 'poti',
+    waypointName: 'Poti Intermodal Rail Yard',
+    assetValueUsd: 54000,
+    departureDate: '2026-09-20',
+    eta: '2026-10-04 (5.5 Days)',
+    bhi: 89.1,
+    predictedRulHours: 216,
+    status: 'OPTIMAL',
+    telemetry: {
+      temperature: 3.8,
+      humidity: 88,
+      ethanol: 8.5,
+      vibration: 0.4,
+    },
+  },
+  {
+    id: 'FS-3319',
+    cargo: 'beef',
+    cargoNameEn: 'Steppe Prime Chilled Lamb Cuts',
+    exporter: 'Batys Agro Export',
+    carrier: 'Aktau Logistics Marine Fleet',
+    origin: 'Uralsk, Kazakhstan',
+    destination: 'Doha Commercial Port, Qatar',
+    currentWaypoint: 'istanbul',
+    waypointName: 'Marmara Transit Corridor',
+    assetValueUsd: 85000,
+    departureDate: '2026-09-18',
+    eta: '2026-10-08 (9 Days)',
+    bhi: 98.2,
+    predictedRulHours: 510,
+    status: 'OPTIMAL',
+    telemetry: {
+      temperature: 1.8,
+      humidity: 84,
+      ethanol: 3.1,
+      vibration: 0.2,
+    },
+  },
+  {
+    id: 'FS-7750',
+    cargo: 'dairy',
+    cargoNameEn: 'Amiran Infant Formula & Yogurt',
+    exporter: 'Amiran Dairy Corporation',
+    carrier: 'KTZ Reefer Fleet Services',
+    origin: 'Almaty, Kazakhstan',
+    destination: 'Tbilisi Food Terminal, Georgia',
+    currentWaypoint: 'baku',
+    waypointName: 'Baku Alat Inland Dry Port',
+    assetValueUsd: 42000,
+    departureDate: '2026-09-25',
+    eta: '2026-10-01 (2.5 Days)',
+    bhi: 58.0,
+    predictedRulHours: 42,
+    status: 'WARNING',
+    telemetry: {
+      temperature: 8.4,
+      humidity: 81,
+      ethanol: 22.4,
+      vibration: 0.9,
+    },
+    alert: {
+      severity: 'WARNING',
+      message: 'Reefer unit compressor intermittent fault. Temperature reached +8.4°C under high ambient staging temperature.',
+      timestamp: '1 hour ago',
+      action: 'Dispatch on-call mobile technician at Alat Dry Port for coolant pressure valve inspection.',
+      location: 'Baku Alat Inland Dry Port',
+    },
+  },
+];
+
+async function main() {
+  console.log('Seeding FreshStream database...');
+
+  // 1. Create or upsert Company
+  const company = await prisma.company.upsert({
+    where: { code: 'KAZ-AGRO-01' },
+    update: {
+      name: 'KazAgro ColdChain Trans LLP',
+      country: 'Kazakhstan',
+    },
+    create: {
+      name: 'KazAgro ColdChain Trans LLP',
+      code: 'KAZ-AGRO-01',
+      country: 'Kazakhstan',
+    },
+  });
+  console.log(`✓ Company seeded: ${company.name} (${company.code})`);
+
+  // 2. Hash test password
+  const hashedPassword = await bcrypt.hash('Password123!', 10);
+
+  // 3. Upsert Users
+  const adminUser = await prisma.user.upsert({
+    where: { email: 'admin@freshstream.ai' },
+    update: {
+      name: 'Admin Officer',
+      password: hashedPassword,
+      role: 'ADMIN',
+      companyId: company.id,
+    },
+    create: {
+      email: 'admin@freshstream.ai',
+      name: 'Admin Officer',
+      password: hashedPassword,
+      role: 'ADMIN',
+      companyId: company.id,
+    },
+  });
+  console.log(`✓ User seeded: ${adminUser.email} [${adminUser.role}]`);
+
+  const operatorUser = await prisma.user.upsert({
+    where: { email: 'operator@freshstream.ai' },
+    update: {
+      name: 'Field Dispatcher',
+      password: hashedPassword,
+      role: 'OPERATOR',
+      companyId: company.id,
+    },
+    create: {
+      email: 'operator@freshstream.ai',
+      name: 'Field Dispatcher',
+      password: hashedPassword,
+      role: 'OPERATOR',
+      companyId: company.id,
+    },
+  });
+  console.log(`✓ User seeded: ${operatorUser.email} [${operatorUser.role}]`);
+
+  // 4. Seed Shipments & Initial Telemetry Logs
+  for (const s of INITIAL_SHIPMENTS_SEED) {
+    const shipment = await prisma.shipment.upsert({
+      where: { id: s.id },
+      update: {
+        cargo: s.cargo,
+        cargoNameEn: s.cargoNameEn,
+        exporter: s.exporter,
+        carrier: s.carrier,
+        origin: s.origin,
+        destination: s.destination,
+        currentWaypoint: s.currentWaypoint,
+        waypointName: s.waypointName,
+        assetValueUsd: s.assetValueUsd,
+        departureDate: s.departureDate,
+        eta: s.eta,
+        bhi: s.bhi,
+        predictedRulHours: s.predictedRulHours,
+        status: s.status,
+        temperature: s.telemetry.temperature,
+        humidity: s.telemetry.humidity,
+        ethanol: s.telemetry.ethanol,
+        vibration: s.telemetry.vibration,
+        alertSeverity: s.alert?.severity || null,
+        alertMessage: s.alert?.message || null,
+        alertTimestamp: s.alert?.timestamp || null,
+        alertAction: s.alert?.action || null,
+        alertLocation: s.alert?.location || null,
+        companyId: company.id,
+      },
+      create: {
+        id: s.id,
+        cargo: s.cargo,
+        cargoNameEn: s.cargoNameEn,
+        exporter: s.exporter,
+        carrier: s.carrier,
+        origin: s.origin,
+        destination: s.destination,
+        currentWaypoint: s.currentWaypoint,
+        waypointName: s.waypointName,
+        assetValueUsd: s.assetValueUsd,
+        departureDate: s.departureDate,
+        eta: s.eta,
+        bhi: s.bhi,
+        predictedRulHours: s.predictedRulHours,
+        status: s.status,
+        temperature: s.telemetry.temperature,
+        humidity: s.telemetry.humidity,
+        ethanol: s.telemetry.ethanol,
+        vibration: s.telemetry.vibration,
+        alertSeverity: s.alert?.severity || null,
+        alertMessage: s.alert?.message || null,
+        alertTimestamp: s.alert?.timestamp || null,
+        alertAction: s.alert?.action || null,
+        alertLocation: s.alert?.location || null,
+        companyId: company.id,
+      },
+    });
+
+    // Delete previous telemetry logs for idempotent seeding
+    await prisma.telemetryLog.deleteMany({
+      where: { shipmentId: shipment.id },
+    });
+
+    // Create 3 historical telemetry logs for each shipment
+    const baseTime = Date.now();
+    const logs = [
+      {
+        shipmentId: shipment.id,
+        timestamp: new Date(baseTime - 20 * 60 * 1000),
+        temperature: Math.round((s.telemetry.temperature - 0.2) * 10) / 10,
+        humidity: Math.round((s.telemetry.humidity - 1) * 10) / 10,
+        ethanol: Math.round((s.telemetry.ethanol - 0.5) * 10) / 10,
+        vibration: s.telemetry.vibration,
+        bhi: s.bhi,
+        predictedRulHours: s.predictedRulHours,
+        status: s.status,
+        source: 'INITIAL_SEED',
+      },
+      {
+        shipmentId: shipment.id,
+        timestamp: new Date(baseTime - 10 * 60 * 1000),
+        temperature: Math.round((s.telemetry.temperature - 0.1) * 10) / 10,
+        humidity: s.telemetry.humidity,
+        ethanol: Math.round((s.telemetry.ethanol - 0.2) * 10) / 10,
+        vibration: s.telemetry.vibration,
+        bhi: s.bhi,
+        predictedRulHours: s.predictedRulHours,
+        status: s.status,
+        source: 'INITIAL_SEED',
+      },
+      {
+        shipmentId: shipment.id,
+        timestamp: new Date(baseTime),
+        temperature: s.telemetry.temperature,
+        humidity: s.telemetry.humidity,
+        ethanol: s.telemetry.ethanol,
+        vibration: s.telemetry.vibration,
+        bhi: s.bhi,
+        predictedRulHours: s.predictedRulHours,
+        status: s.status,
+        source: 'INITIAL_SEED',
+      },
+    ];
+
+    await prisma.telemetryLog.createMany({
+      data: logs,
+    });
+
+    console.log(`✓ Shipment seeded: ${shipment.id} (${shipment.cargoNameEn}) with 3 telemetry logs`);
+  }
+
+  console.log('Database seeding completed successfully.');
+}
+
+main()
+  .catch((e) => {
+    console.error('Error during database seeding:', e);
+    process.exit(1);
+  })
+  .finally(async () => {
+    await prisma.$disconnect();
+  });

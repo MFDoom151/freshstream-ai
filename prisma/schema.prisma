@@ -1,0 +1,80 @@
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Company {
+  id        String     @id @default(cuid())
+  name      String
+  code      String     @unique
+  country   String     @default("Kazakhstan")
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  users     User[]
+  shipments Shipment[]
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  password  String
+  role      String   @default("OPERATOR") // "ADMIN" | "OPERATOR" | "VIEWER"
+  companyId String?
+  company   Company? @relation(fields: [companyId], references: [id], onDelete: SetNull)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Shipment {
+  id                String         @id // e.g. "FS-8821"
+  cargo             String         // "beef" | "berries" | "dairy" | "fruits"
+  cargoNameEn       String
+  exporter          String
+  carrier           String
+  origin            String
+  destination       String
+  currentWaypoint   String         // "dostyk" | "almaty" | "kuryk" | "baku" | "poti" | "istanbul"
+  waypointName      String
+  assetValueUsd     Float
+  departureDate     String
+  eta               String
+  bhi               Float          // current health index (0 - 100)
+  predictedRulHours Float
+  status            String         // "OPTIMAL" | "WARNING" | "CRITICAL"
+  temperature       Float?         @default(4.0)
+  humidity          Float?         @default(85.0)
+  ethanol           Float?         @default(5.0)
+  vibration         Float?         @default(0.2)
+  alertSeverity     String?
+  alertMessage      String?
+  alertTimestamp    String?
+  alertAction       String?
+  alertLocation     String?
+  companyId         String?
+  company           Company?       @relation(fields: [companyId], references: [id], onDelete: SetNull)
+  telemetryLogs     TelemetryLog[]
+  createdAt         DateTime       @default(now())
+  updatedAt         DateTime       @updatedAt
+}
+
+model TelemetryLog {
+  id                String   @id @default(cuid())
+  shipmentId        String
+  shipment          Shipment @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+  timestamp         DateTime @default(now())
+  temperature       Float
+  humidity          Float
+  ethanol           Float
+  vibration         Float
+  bhi               Float?
+  predictedRulHours Float?
+  status            String?
+  source            String?  @default("EMULATOR")
+
+  @@index([shipmentId, timestamp])
+}

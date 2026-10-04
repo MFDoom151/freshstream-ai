@@ -1,0 +1,59 @@
+services:
+  web:
+    container_name: freshstream-web
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - DATABASE_URL=file:/app/prisma/dev.db
+      - NEXTAUTH_URL=http://localhost:3000
+      - NEXTAUTH_SECRET=freshstream-production-secret-key-32chars
+      - DOCKER_BUILD=1
+    volumes:
+      - sqlite_data:/app/prisma
+    networks:
+      - freshstream-network
+    restart: unless-stopped
+
+  emulator:
+    container_name: freshstream-emulator
+    build:
+      context: .
+      dockerfile: Dockerfile.emulator
+    environment:
+      - BACKEND_URL=http://web:3000
+      - SHIPMENT_ID=FS-8821
+      - INTERVAL_MS=2000
+    depends_on:
+      - web
+    networks:
+      - freshstream-network
+    restart: unless-stopped
+
+  tg-bot:
+    container_name: freshstream-tg-bot
+    build:
+      context: ./tg-bot
+      dockerfile: Dockerfile
+    environment:
+      - BACKEND_URL=http://web:3000
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN:-}
+      - TELEGRAM_CHAT_ID=${TELEGRAM_CHAT_ID:-}
+      - POLL_INTERVAL_MS=5000
+      - COOLDOWN_SECONDS=300
+    depends_on:
+      - web
+    networks:
+      - freshstream-network
+    restart: unless-stopped
+
+volumes:
+  sqlite_data:
+    driver: local
+
+networks:
+  freshstream-network:
+    driver: bridge
