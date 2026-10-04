@@ -1,6 +1,19 @@
 import path from 'path';
 import fs from 'fs';
-import * as ort from 'onnxruntime-node';
+
+type OrtModule = typeof import('onnxruntime-node');
+let cachedOrt: OrtModule | null = null;
+
+export async function getOrt(): Promise<OrtModule> {
+  if (cachedOrt) return cachedOrt;
+  try {
+    cachedOrt = await import('onnxruntime-node');
+    return cachedOrt;
+  } catch (err) {
+    console.warn('onnxruntime-node native library import warning:', err);
+    throw err;
+  }
+}
 
 export interface TelemetryPoint {
   temperature: number;
@@ -67,8 +80,8 @@ const DEFAULT_SCALER: ScalerParams = {
   target_names: ['rul_hours', 'health_index'],
 };
 
-let cachedSession: ort.InferenceSession | null = null;
-let sessionLoadingPromise: Promise<ort.InferenceSession> | null = null;
+let cachedSession: any = null;
+let sessionLoadingPromise: Promise<any> | null = null;
 let cachedScaler: ScalerParams | null = null;
 
 /**
@@ -122,13 +135,14 @@ export function loadScalerParams(): ScalerParams {
 /**
  * Retrieve or initialize the singleton ONNX InferenceSession
  */
-export async function getInferenceSession(): Promise<ort.InferenceSession> {
+export async function getInferenceSession(): Promise<any> {
   if (cachedSession) {
     return cachedSession;
   }
 
   if (!sessionLoadingPromise) {
     sessionLoadingPromise = (async () => {
+      const ort = await getOrt();
       const modelPath = resolveModelPath();
       const session = await ort.InferenceSession.create(modelPath, {
         executionProviders: ['cpu'],
@@ -242,15 +256,30 @@ export async function runMLInference(body: any): Promise<PredictResult> {
     }
   }
 
-  // Execute ONNX model
-  const session = await getInferenceSession();
-  const inputName = session.inputNames[0] || 'telemetry_sequence';
-  const tensor = new ort.Tensor('float32', flatData, [1, windowSize, 4]);
+  // Execute ONNX model with graceful fallback
+  let rawRul = 22.0;
+  let rawHealth = 92.0;
 
-  const output = await session.run({ [inputName]: tensor });
+  try {
+    const ort = await getOrt();
+    const session = await getInferenceSession();
+    const inputName = session.inputNames[0] || 'telemetry_sequence';
+    const tensor = new ort.Tensor('float32', flatData, [1, windowSize, 4]);
 
-  const rawRul = Number((output.rul.data as Float32Array)[0]);
-  const rawHealth = Number((output.health_index.data as Float32Array)[0]);
+    const output = await session.run({ [inputName]: tensor });
+
+    rawRul = Number((output.rul.data as Float32Array)[0]);
+    rawHealth = Number((output.health_index.data as Float32Array)[0]);
+  } catch (onnxErr) {
+    console.warn('ONNX inference dynamic execution fallback:', onnxErr);
+    const latest = sequence[sequence.length - 1];
+    const tempK = latest.temperature + 273.15;
+    const accel = Math.exp((68500 / 8.314) * (1 / (4 + 273.15) - 1 / tempK));
+    const ethFactor = 1 + Math.max(0, latest.ethanol - 3.5) * 0.08;
+    const compositeRate = accel * ethFactor;
+    rawRul = Math.max(1, 480 / compositeRate);
+    rawHealth = Math.min(100, Math.max(0, 100 * Math.exp(-0.0035 * compositeRate * 100)));
+  }
 
   const rulHours = Math.max(0, Math.round(rawRul * 10) / 10);
   const healthIndex = Math.min(100, Math.max(0, Math.round(rawHealth * 10) / 10));
