@@ -28,6 +28,8 @@ jobs:
         run: |
           npx prisma generate
           npx prisma migrate dev --name init || npx prisma db push
+        env:
+          DATABASE_URL: file:./dev.db
 
       - name: Run ESLint
         run: npm run lint
