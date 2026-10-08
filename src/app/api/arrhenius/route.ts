@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { calculateKinetics, COMMODITY_PROFILES } from '@/lib/arrhenius';
-import { CargoType, RouteWaypoint, TelemetryInput, KineticsOutput } from '@/types/arrhenius';
+import { CargoType, RouteWaypoint, TelemetryInput } from '@/types/arrhenius';
 
 interface ValidationError {
   field: string;

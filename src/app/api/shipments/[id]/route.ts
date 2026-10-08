@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { getShipmentById, INITIAL_SHIPMENTS } from '@/lib/shipments-data';
+import { getShipmentById } from '@/lib/shipments-data';
 import { ShipmentItem } from '@/types/shipment';
 
 export async function GET(
