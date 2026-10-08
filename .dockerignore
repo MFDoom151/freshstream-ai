@@ -6,6 +6,6 @@ node_modules
 Dockerfile
 .dockerignore
 .env*
-scripts
+scripts/run-e2e-tests.mjs
 .eslintrc.json
 tsconfig.tsbuildinfo
