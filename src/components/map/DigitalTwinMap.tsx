@@ -79,14 +79,14 @@ export const DigitalTwinMap: React.FC<DigitalTwinMapProps> = ({
   className = '',
 }) => {
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
-  const mapInstanceRef = useRef<any>(null);
-  const tileLayerRef = useRef<any>(null);
-  const refTileLayerRef = useRef<any>(null);
+  const mapInstanceRef = useRef<L.Map | null>(null);
+  const tileLayerRef = useRef<L.TileLayer | null>(null);
+  const refTileLayerRef = useRef<L.TileLayer | null>(null);
   const layersGroupRef = useRef<{
-    routes: any;
-    hubs: any;
-    shipments: any;
-    events: any;
+    routes: L.LayerGroup | null;
+    hubs: L.LayerGroup | null;
+    shipments: L.LayerGroup | null;
+    events: L.LayerGroup | null;
   }>({ routes: null, hubs: null, shipments: null, events: null });
 
   // State
@@ -152,7 +152,7 @@ export const DigitalTwinMap: React.FC<DigitalTwinMapProps> = ({
       }
 
       // Track mouse coordinates
-      map.on('mousemove', (e: any) => {
+      map.on('mousemove', (e: L.LeafletMouseEvent) => {
         setCursorCoords({
           lat: e.latlng.lat.toFixed(4),
           lng: e.latlng.lng.toFixed(4),
@@ -212,12 +212,12 @@ export const DigitalTwinMap: React.FC<DigitalTwinMapProps> = ({
       tileLayerRef.current = L.tileLayer(baseCfg.url, {
         attribution: baseCfg.attribution,
         maxZoom: baseCfg.maxZoom,
-      }).addTo(mapInstanceRef.current);
+      }).addTo(mapInstanceRef.current!);
 
       if (baseCfg.refUrl) {
         refTileLayerRef.current = L.tileLayer(baseCfg.refUrl, {
           maxZoom: baseCfg.maxZoom,
-        }).addTo(mapInstanceRef.current);
+        }).addTo(mapInstanceRef.current!);
       }
     });
   }, [basemap]);
@@ -239,13 +239,13 @@ export const DigitalTwinMap: React.FC<DigitalTwinMapProps> = ({
       setSelectedShipment(target);
       const pos = SHIPMENT_GEO_POSITIONS[target.id];
       if (pos) {
-        mapInstanceRef.current.flyTo([pos.lat, pos.lng], 7, { duration: 1.2 });
+        mapInstanceRef.current?.flyTo([pos.lat, pos.lng], 7, { duration: 1.2 });
       }
     }
   }, [highlightShipmentId, shipments]);
 
   // Core Render Method for Map Layers
-  const renderLayers = (L: any) => {
+  const renderLayers = (L: typeof import("leaflet")) => {
     const { routes, hubs, shipments: shipsGroup, events } = layersGroupRef.current;
     if (!routes || !hubs || !shipsGroup || !events) return;
 
@@ -258,7 +258,7 @@ export const DigitalTwinMap: React.FC<DigitalTwinMapProps> = ({
     // 1. Draw Corridor Routes
     if (showRoutes) {
       CORRIDOR_ROUTES.forEach((route) => {
-        const polylineOptions: any = {
+        const polylineOptions: L.PolylineOptions = {
           color: route.color,
           weight: route.mode === 'SEA' ? 3.5 : 3,
           opacity: 0.85,
@@ -305,7 +305,7 @@ export const DigitalTwinMap: React.FC<DigitalTwinMapProps> = ({
           setSelectedHub(hub);
           setSelectedEvent(null);
           setSelectedShipment(null);
-          mapInstanceRef.current.flyTo([hub.lat, hub.lng], 7, { duration: 0.8 });
+          mapInstanceRef.current?.flyTo([hub.lat, hub.lng], 7, { duration: 0.8 });
         });
         marker.addTo(hubs);
       });
@@ -347,7 +347,7 @@ export const DigitalTwinMap: React.FC<DigitalTwinMapProps> = ({
           setSelectedShipment(shipment);
           setSelectedEvent(null);
           setSelectedHub(null);
-          mapInstanceRef.current.flyTo([geo.lat, geo.lng], 8, { duration: 0.8 });
+          mapInstanceRef.current?.flyTo([geo.lat, geo.lng], 8, { duration: 0.8 });
         });
         marker.addTo(shipsGroup);
       });
@@ -402,7 +402,7 @@ export const DigitalTwinMap: React.FC<DigitalTwinMapProps> = ({
           setSelectedEvent(evt);
           setSelectedShipment(null);
           setSelectedHub(null);
-          mapInstanceRef.current.flyTo([evt.lat, evt.lng], 8, { duration: 0.8 });
+          mapInstanceRef.current?.flyTo([evt.lat, evt.lng], 8, { duration: 0.8 });
         });
         marker.addTo(events);
       });
@@ -412,7 +412,7 @@ export const DigitalTwinMap: React.FC<DigitalTwinMapProps> = ({
   // Center fit corridor bounds
   const handleFitCorridor = () => {
     if (!mapInstanceRef.current) return;
-    mapInstanceRef.current.flyToBounds(
+    mapInstanceRef.current?.flyToBounds(
       [
         [38.5, 27.0], // SW (Turkey/South Caucasus)
         [46.5, 82.0], // NE (Almaty/Khorgos)
@@ -426,7 +426,7 @@ export const DigitalTwinMap: React.FC<DigitalTwinMapProps> = ({
     setSelectedShipment(null);
     setSelectedHub(null);
     if (mapInstanceRef.current) {
-      mapInstanceRef.current.flyTo([evt.lat, evt.lng], 8, { duration: 1.0 });
+      mapInstanceRef.current?.flyTo([evt.lat, evt.lng], 8, { duration: 1.0 });
     }
   };
 
