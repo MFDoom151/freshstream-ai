@@ -62,43 +62,43 @@ export const Header: React.FC = () => {
     <header
       className={`sticky top-0 z-50 transition-all duration-300 border-b ${
         scrolled
-          ? 'backdrop-blur-2xl bg-slate-950/85 dark:bg-slate-950/85 light:bg-white/90 border-slate-800/80 shadow-lg'
-          : 'backdrop-blur-xl bg-slate-950/70 dark:bg-slate-950/70 light:bg-white/80 border-slate-800/40'
+          ? 'backdrop-blur-2xl bg-white/90 dark:bg-slate-950/85 border-slate-200 dark:border-slate-800/80 shadow-sm'
+          : 'backdrop-blur-xl bg-white/80 dark:bg-slate-950/70 border-slate-200 dark:border-slate-800/40'
       }`}
     >
       <Container size="lg">
         <div className="flex items-center justify-between h-20">
-          {/* Brand Logo & Academic Badge */}
+          {/* Brand Logo & Enterprise Badge */}
           <div className="flex items-center gap-3">
             <Link 
               href="/" 
               className="flex items-center gap-2.5 group focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 rounded-lg p-1"
               aria-label="FreshStream AI Homepage"
             >
-              <div className="relative flex items-center justify-center w-9 h-9 rounded-lg bg-slate-900 border border-slate-700/80 group-hover:border-emerald-500/60 transition-colors">
-                <Activity className="w-4 h-4 text-emerald-400" />
+              <div className="relative flex items-center justify-center w-9 h-9 rounded-lg bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-700/80 group-hover:border-emerald-500/60 transition-colors">
+                <Activity className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                 <span className="absolute top-1 right-1 flex h-1.5 w-1.5">
-                  <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-400" />
+                  <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500" />
                 </span>
               </div>
               <div className="flex flex-col">
                 <div className="flex items-center gap-1.5">
-                  <span className="text-lg font-bold tracking-tight text-white dark:text-white light:text-slate-900">
+                  <span className="text-lg font-bold tracking-tight text-slate-900 dark:text-white">
                     FreshStream
                   </span>
-                  <span className="text-[10px] font-mono font-bold tracking-wider uppercase px-1.5 py-0.5 rounded bg-slate-800 text-emerald-400 border border-slate-700">
+                  <span className="text-[10px] font-mono font-bold tracking-wider uppercase px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-emerald-700 dark:text-emerald-400 border border-slate-200 dark:border-slate-700">
                     TWIN-OS
                   </span>
                 </div>
-                <span className="text-[10px] text-slate-400 tracking-wider font-mono hidden sm:block">
+                <span className="text-[10px] text-slate-500 dark:text-slate-400 tracking-wider font-mono hidden sm:block">
                   Trans-Caspian Bio-Digital Twin
                 </span>
               </div>
             </Link>
 
             {/* Enterprise Status Badge (Hidden on mobile) */}
-            <div className="hidden xl:flex items-center gap-1.5 ml-3 pl-3 border-l border-slate-800 text-[11px] text-emerald-400 font-mono">
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+            <div className="hidden xl:flex items-center gap-1.5 ml-3 pl-3 border-l border-slate-200 dark:border-slate-800 text-[11px] text-emerald-600 dark:text-emerald-400 font-mono">
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
               <span>ENTERPRISE DIGITAL TWIN</span>
             </div>
           </div>
@@ -118,13 +118,13 @@ export const Header: React.FC = () => {
                   href={link.href}
                   className={`relative px-3 py-1.5 rounded-lg text-xs xl:text-sm font-medium transition-all duration-150 flex items-center gap-1.5 ${
                     isActive
-                      ? 'text-emerald-400 bg-slate-900 border border-slate-700/80 font-semibold'
-                      : 'text-slate-300 hover:text-white hover:bg-slate-800/60 light:text-slate-700 light:hover:text-slate-900 light:hover:bg-slate-100'
+                      ? 'text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-slate-900 border border-emerald-200 dark:border-slate-700/80 font-semibold'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-300 dark:hover:text-white dark:hover:bg-slate-800/60'
                   }`}
                 >
                   {link.label}
                   {link.isLive && (
-                    <span className="px-1.5 py-0.5 text-[9px] font-mono font-bold rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                    <span className="px-1.5 py-0.5 text-[9px] font-mono font-bold rounded bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30">
                       LIVE
                     </span>
                   )}
@@ -140,12 +140,12 @@ export const Header: React.FC = () => {
 
             {/* User Session Info / Sign Out / Sign In (Desktop) */}
             {status === 'authenticated' && session?.user ? (
-              <div className="hidden sm:flex items-center gap-2.5 pl-3 border-l border-slate-800">
+              <div className="hidden sm:flex items-center gap-2.5 pl-3 border-l border-slate-200 dark:border-slate-800">
                 <div className="flex flex-col text-right">
-                  <span className="text-xs font-semibold text-white max-w-[130px] truncate">
+                  <span className="text-xs font-semibold text-slate-900 dark:text-white max-w-[130px] truncate">
                     {session.user.email}
                   </span>
-                  <span className="text-[10px] text-emerald-400 font-mono font-medium">
+                  <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-mono font-medium">
                     {session.user.role === 'ADMIN'
                       ? (t('auth.admin_role') || 'Admin')
                       : (t('auth.operator_role') || 'Dispatcher')}
@@ -154,7 +154,7 @@ export const Header: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => signOut({ callbackUrl: '/login' })}
-                  className="p-1.5 rounded-lg text-slate-400 hover:text-red-400 hover:bg-slate-800/80 transition-colors cursor-pointer"
+                  className="p-1.5 rounded-lg text-slate-500 hover:text-red-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-red-400 dark:hover:bg-slate-800/80 transition-colors cursor-pointer"
                   title={t('auth.sign_out') || 'Sign Out'}
                   aria-label={t('auth.sign_out') || 'Sign Out'}
                 >
@@ -162,10 +162,10 @@ export const Header: React.FC = () => {
                 </button>
               </div>
             ) : (
-              <div className="hidden sm:flex items-center pl-2 border-l border-slate-800">
+              <div className="hidden sm:flex items-center pl-2 border-l border-slate-200 dark:border-slate-800">
                 <Link
                   href="/login"
-                  className="px-3 py-1.5 rounded-lg text-xs font-medium text-slate-300 hover:text-white hover:bg-slate-800/60 transition-colors"
+                  className="px-3 py-1.5 rounded-lg text-xs font-medium text-slate-600 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-300 dark:hover:text-white dark:hover:bg-slate-800/60 transition-colors"
                 >
                   {t('nav.sign_in') || 'Sign In'}
                 </Link>
@@ -188,11 +188,11 @@ export const Header: React.FC = () => {
             <button
               type="button"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-2 rounded-xl bg-slate-800/70 hover:bg-slate-800 text-slate-200 border border-slate-700/60 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 cursor-pointer"
+              className="lg:hidden p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 dark:bg-slate-800/70 dark:hover:bg-slate-800 dark:text-slate-200 dark:border-slate-700/60 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-400 cursor-pointer"
               aria-label={mobileMenuOpen ? t('nav.menu_close') : t('nav.menu_open')}
               aria-expanded={mobileMenuOpen}
             >
-              {mobileMenuOpen ? <X className="w-5 h-5 text-emerald-400" /> : <Menu className="w-5 h-5" />}
+              {mobileMenuOpen ? <X className="w-5 h-5 text-emerald-600 dark:text-emerald-400" /> : <Menu className="w-5 h-5" />}
             </button>
           </div>
         </div>
@@ -209,7 +209,7 @@ export const Header: React.FC = () => {
 
       {/* Mobile Drawer Sheet */}
       <div
-        className={`fixed top-0 right-0 bottom-0 w-80 max-w-[85vw] bg-slate-950/95 dark:bg-slate-950/95 light:bg-white/95 backdrop-blur-2xl border-l border-slate-800 p-6 z-50 shadow-2xl flex flex-col justify-between overflow-y-auto transform transition-transform duration-300 ease-in-out lg:hidden ${
+        className={`fixed top-0 right-0 bottom-0 w-80 max-w-[85vw] bg-white/95 dark:bg-slate-950/95 backdrop-blur-2xl border-l border-slate-200 dark:border-slate-800 p-6 z-50 shadow-2xl flex flex-col justify-between overflow-y-auto transform transition-transform duration-300 ease-in-out lg:hidden ${
           mobileMenuOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
         role="dialog"
@@ -218,14 +218,14 @@ export const Header: React.FC = () => {
       >
         <div className="flex flex-col gap-6">
           {/* Drawer Header */}
-          <div className="flex items-center justify-between pb-4 border-b border-slate-800">
+          <div className="flex items-center justify-between pb-4 border-b border-slate-200 dark:border-slate-800">
             <div className="flex items-center gap-2">
-              <Activity className="w-5 h-5 text-emerald-400" />
-              <span className="font-bold text-lg text-white dark:text-white light:text-slate-900">FreshStream AI</span>
+              <Activity className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
+              <span className="font-bold text-lg text-slate-900 dark:text-white">FreshStream AI</span>
             </div>
             <button
               onClick={() => setMobileMenuOpen(false)}
-              className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 light:text-slate-600 light:hover:text-slate-900 light:hover:bg-slate-100 cursor-pointer"
+              className="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-white dark:hover:bg-slate-800 cursor-pointer"
               aria-label="Close menu"
             >
               <X className="w-5 h-5" />
@@ -245,8 +245,8 @@ export const Header: React.FC = () => {
                   onClick={() => setMobileMenuOpen(false)}
                   className={`flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium transition-all ${
                     isActive
-                      ? 'bg-emerald-500/15 text-emerald-400 font-semibold border border-emerald-500/30'
-                      : 'text-slate-300 hover:text-white hover:bg-slate-900/60 light:text-slate-700 light:hover:text-slate-900 light:hover:bg-slate-100'
+                      ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-500/15 dark:text-emerald-400 dark:border-emerald-500/30 font-semibold'
+                      : 'text-slate-700 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-300 dark:hover:text-white dark:hover:bg-slate-900/60'
                   }`}
                 >
                   <span>{link.label}</span>
@@ -262,9 +262,9 @@ export const Header: React.FC = () => {
         </div>
 
         {/* Drawer Footer Actions */}
-        <div className="pt-6 border-t border-slate-800 flex flex-col gap-4">
+        <div className="pt-6 border-t border-slate-200 dark:border-slate-800 flex flex-col gap-4">
           <div className="flex items-center justify-between">
-            <span className="text-xs text-slate-400 font-medium">{t('nav.select_lang')}</span>
+            <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">{t('nav.select_lang')}</span>
             <div className="flex items-center gap-1">
               {(['en', 'ru', 'kz'] as const).map((code) => (
                 <button
@@ -272,8 +272,8 @@ export const Header: React.FC = () => {
                   onClick={() => setLocale(code)}
                   className={`px-2.5 py-1 text-xs rounded-lg uppercase font-mono font-bold transition-colors cursor-pointer ${
                     locale === code
-                      ? 'bg-emerald-500 text-slate-950 shadow-sm'
-                      : 'bg-slate-800 text-slate-400 hover:text-white'
+                      ? 'bg-emerald-600 text-white shadow-sm'
+                      : 'bg-slate-100 text-slate-600 hover:text-slate-900 dark:bg-slate-800 dark:text-slate-400 dark:hover:text-white'
                   }`}
                 >
                   {code}
@@ -284,12 +284,12 @@ export const Header: React.FC = () => {
 
           {/* Mobile User Session Status */}
           {status === 'authenticated' && session?.user ? (
-            <div className="p-3 rounded-xl bg-slate-900/90 border border-slate-800 flex items-center justify-between">
+            <div className="p-3 rounded-xl bg-slate-50 dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 flex items-center justify-between">
               <div className="flex flex-col min-w-0 pr-2">
-                <span className="text-xs font-semibold text-white truncate">
+                <span className="text-xs font-semibold text-slate-900 dark:text-white truncate">
                   {session.user.email}
                 </span>
-                <span className="text-[10px] text-emerald-400 font-mono">
+                <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-mono">
                   {session.user.role === 'ADMIN' ? (t('auth.admin_role') || 'Admin') : (t('auth.operator_role') || 'Dispatcher')}
                 </span>
               </div>
@@ -299,7 +299,7 @@ export const Header: React.FC = () => {
                   setMobileMenuOpen(false);
                   signOut({ callbackUrl: '/login' });
                 }}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-red-400 hover:bg-slate-800 transition-colors shrink-0"
+                className="p-1.5 rounded-lg text-slate-500 hover:text-red-500 hover:bg-slate-100 dark:text-slate-400 dark:hover:text-red-400 dark:hover:bg-slate-800 transition-colors shrink-0"
                 title={t('auth.sign_out') || 'Sign Out'}
               >
                 <LogOut className="w-4 h-4" />
@@ -309,7 +309,7 @@ export const Header: React.FC = () => {
             <Link
               href="/login"
               onClick={() => setMobileMenuOpen(false)}
-              className="text-center py-2 px-3 text-xs font-semibold text-emerald-400 hover:text-emerald-300 border border-emerald-500/30 hover:border-emerald-500/50 bg-emerald-500/10 rounded-xl transition-colors"
+              className="text-center py-2 px-3 text-xs font-semibold text-emerald-700 hover:text-emerald-800 dark:text-emerald-400 dark:hover:text-emerald-300 border border-emerald-500/30 hover:border-emerald-500/50 bg-emerald-500/10 rounded-xl transition-colors"
             >
               {t('nav.sign_in') || 'Sign In'}
             </Link>

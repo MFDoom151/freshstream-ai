@@ -1,3 +1,5 @@
+import { TransportMode, TransportModeConfig } from '@/types/telemetry';
+
 export interface MapWaypointHub {
   id: string;
   name: string;
@@ -7,6 +9,7 @@ export interface MapWaypointHub {
   lng: number;
   type: 'dry-port' | 'seaport' | 'rail-hub' | 'customs-gateway' | 'gauge-break';
   isBottleneck?: boolean;
+  isGaugeBreak?: boolean;
   throughputTeuPerYear: string;
   coldStorageCapacityM3: string;
   gaugeMm?: string;
@@ -43,11 +46,16 @@ export interface CorridorEvent {
     vibration: number;
     co2?: number;
     o2?: number;
+    ethylene?: number;
   };
   bhi?: number;
   rulHours?: number;
   dcsaEventCode?: string;
 }
+
+// =============================================================================
+// 1. 16 MIDDLE CORRIDOR (TITR) HUBS & WAYPOINTS
+// =============================================================================
 
 export const CORRIDOR_HUBS: MapWaypointHub[] = [
   {
@@ -57,7 +65,8 @@ export const CORRIDOR_HUBS: MapWaypointHub[] = [
     country: 'Kazakhstan',
     lat: 44.2185,
     lng: 80.4072,
-    type: 'dry-port',
+    type: 'gauge-break',
+    isGaugeBreak: true,
     throughputTeuPerYear: '540,000 TEU',
     coldStorageCapacityM3: '45,000 m³',
     gaugeMm: '1435mm ⇄ 1520mm',
@@ -152,7 +161,7 @@ export const CORRIDOR_HUBS: MapWaypointHub[] = [
     isBottleneck: true,
     throughputTeuPerYear: '260,000 TEU',
     coldStorageCapacityM3: '40,000 m³',
-    gaugeMm: 'Ro-Pax Rail Ramp',
+    gaugeMm: 'Ro-Pax Rail Ramp (1520mm)',
     dcsaCode: 'KZKRK',
   },
   {
@@ -204,9 +213,10 @@ export const CORRIDOR_HUBS: MapWaypointHub[] = [
     lng: 43.4860,
     type: 'gauge-break',
     isBottleneck: true,
+    isGaugeBreak: true,
     throughputTeuPerYear: '210,000 TEU',
     coldStorageCapacityM3: '20,000 m³',
-    gaugeMm: '1520mm ⇄ 1435mm European',
+    gaugeMm: '1520mm ⇄ 1435mm European UIC',
     dcsaCode: 'GEAKH',
   },
   {
@@ -232,7 +242,7 @@ export const CORRIDOR_HUBS: MapWaypointHub[] = [
     type: 'rail-hub',
     throughputTeuPerYear: '250,000 TEU',
     coldStorageCapacityM3: '35,000 m³',
-    gaugeMm: '1435mm (Standard)',
+    gaugeMm: '1435mm (Standard UIC)',
     dcsaCode: 'TRKSY',
   },
   {
@@ -258,13 +268,17 @@ export const CORRIDOR_HUBS: MapWaypointHub[] = [
     type: 'customs-gateway',
     throughputTeuPerYear: '1,400,000 TEU',
     coldStorageCapacityM3: '220,000 m³',
-    gaugeMm: '1435mm & Marmaray Subsea',
+    gaugeMm: '1435mm & Marmaray Subsea Tunnel',
     dcsaCode: 'TRIST',
   },
 ];
 
+// =============================================================================
+// 2. CORRIDOR ROUTES (ACCURATE REAL TRACK POLYLINES)
+// =============================================================================
+
 export const CORRIDOR_ROUTES: CorridorRouteSegment[] = [
-  // 1. Authentic Kazakhstan Trans-Steppe Rail Backbone (KTZ Mainline)
+  // 1. Kazakhstan Trans-Steppe Rail Backbone (KTZ Mainline)
   {
     id: 'kz-rail-mainline',
     name: 'KTZ Trans-Kazakhstan Heavy Rail Backbone (1520mm)',
@@ -429,6 +443,147 @@ export const CORRIDOR_ROUTES: CorridorRouteSegment[] = [
   },
 ];
 
+// Composite full-corridor track from Khorgos to Istanbul
+export const MULTIMODAL_TRACK_COORDINATES: [number, number][] = [
+  // 1. Kazakhstan Rail Backbone (Khorgos to Port Kuryk)
+  [44.2185, 80.4072], // Khorgos
+  [43.2389, 76.8897], // Almaty
+  [43.5980, 73.7610], // Shu
+  [42.3417, 69.5901], // Shymkent
+  [44.8500, 65.5000], // Kyzylorda
+  [45.3200, 55.1900], // Beyneu
+  [43.6500, 51.1600], // Aktau
+  [43.1800, 51.6500], // Port Kuryk (Rail Ramp)
+  // 2. Caspian Ferry Crossing (Kuryk to Baku Alat)
+  [42.4000, 51.1000],
+  [41.2000, 50.3500],
+  [39.9950, 49.4100], // Baku Alat
+  // 3. Trans-Caucasus BTK Rail (Baku to Kars via Akhalkalaki)
+  [40.6800, 46.3600], // Ganja
+  [41.7151, 44.8271], // Tbilisi
+  [41.4050, 43.4860], // Akhalkalaki (Gauge Break)
+  [40.6050, 43.0950], // Kars
+  // 4. Trans-Anatolian Rail (Kars to Istanbul)
+  [39.9334, 32.8597], // Ankara
+  [40.8000, 29.4300], // Gebze
+  [40.9833, 28.8167], // Istanbul Halkali
+];
+
+// =============================================================================
+// 3. 5 TRANSPORT MODES CONFIGURATION FOR SIMULATION & ANIMATION
+// =============================================================================
+
+export const TRANSPORT_MODES_CONFIG: Record<TransportMode, TransportModeConfig> = {
+  RAIL_REEFER: {
+    id: 'RAIL_REEFER',
+    name: 'KTZ / BTK Heavy Rail Consist',
+    shortName: 'Heavy Rail',
+    subtitle: 'Trans-Kazakhstan (1520mm) & BTK Trans-Caucasus Network',
+    vehicleType: 'TRAIN',
+    routeIds: ['kz-rail-mainline', 'btk-trans-caucasus-rail', 'trans-anatolian-rail'],
+    bounds: [
+      [38.5, 42.0], // SW
+      [47.5, 81.5], // NE
+    ],
+    strokeColor: '#10B981', // Emerald
+    averageSpeedKmh: 75,
+    nominalTransitDays: 7,
+    gaugeSpecification: '1520mm Russian Broad Gauge ⇄ 1435mm Standard UIC',
+    typicalAssetValueUsd: 78000,
+    activeSegmentDescription: '4-axle insulated platform with central diesel genset power bus powering 30 cold-chain reefer platforms.',
+  },
+
+  RO_PAX_FERRY: {
+    id: 'RO_PAX_FERRY',
+    name: 'Caspian Sea "BARYS-1" Ro-Pax Ferry',
+    shortName: 'Caspian Ferry',
+    subtitle: 'Port Kuryk ⇄ Baku (Alat) Maritime Fairway Crossing',
+    vehicleType: 'SHIP',
+    routeIds: ['caspian-sea-ro-pax'],
+    bounds: [
+      [39.5, 48.5],
+      [43.8, 52.5],
+    ],
+    strokeColor: '#0284C7', // Sky Blue
+    dashArray: '8 6',
+    averageSpeedKmh: 28, // ~15 knots
+    nominalTransitDays: 2,
+    gaugeSpecification: 'Direct Rail-Ferry Roll-On/Roll-Off Ramp (Double Track)',
+    typicalAssetValueUsd: 64000,
+    activeSegmentDescription: 'Maritime crossing connecting Central Asia to Caucasus, equipped with 54 reefer electrical deck hookups.',
+  },
+
+  TIR_TRUCK: {
+    id: 'TIR_TRUCK',
+    name: 'Western Europe - Western China Highway Trailer',
+    shortName: 'TIR Highway',
+    subtitle: 'WE-WC Multimodal Motorway (Khorgos to Aktau Seaport)',
+    vehicleType: 'TRUCK',
+    routeIds: ['we-wc-highway'],
+    bounds: [
+      [41.5, 50.0],
+      [51.0, 81.5],
+    ],
+    strokeColor: '#F59E0B', // Amber
+    averageSpeedKmh: 82,
+    nominalTransitDays: 5,
+    gaugeSpecification: 'Standard TIR Highway / E40 Trans-Eurasian Route',
+    typicalAssetValueUsd: 58000,
+    activeSegmentDescription: 'Thermo King / Carrier autonomous reefer semi-trailers operating on continuous road transit.',
+  },
+
+  SMART_REEFER_CONTAINER: {
+    id: 'SMART_REEFER_CONTAINER',
+    name: '40ft ISO Smart Reefer Container',
+    shortName: 'Smart Container',
+    subtitle: 'IoT Controlled Atmosphere (CA) Container Mesh',
+    vehicleType: 'CONTAINER',
+    routeIds: ['black-sea-feeder', 'black-sea-rail-branch'],
+    bounds: [
+      [40.0, 28.0],
+      [43.0, 42.5],
+    ],
+    strokeColor: '#8B5CF6', // Purple
+    dashArray: '6 4',
+    averageSpeedKmh: 65,
+    nominalTransitDays: 4,
+    gaugeSpecification: 'ISO 668 1AAA 40ft High Cube Intermodal Standard',
+    typicalAssetValueUsd: 72000,
+    activeSegmentDescription: 'Hermetically sealed container with automated CO2/O2 scrubbers and real-time ethylene monitoring.',
+  },
+
+  MULTIMODAL_COMBO: {
+    id: 'MULTIMODAL_COMBO',
+    name: 'Full Trans-Caspian Intermodal Chain',
+    shortName: 'Multimodal Chain',
+    subtitle: 'Rail Consist + Caspian Ferry + BTK Rail + TIR Highway',
+    vehicleType: 'MULTIMODAL',
+    routeIds: [
+      'kz-rail-mainline',
+      'caspian-sea-ro-pax',
+      'btk-trans-caucasus-rail',
+      'black-sea-rail-branch',
+      'trans-anatolian-rail',
+      'we-wc-highway',
+      'black-sea-feeder',
+    ],
+    bounds: [
+      [38.0, 27.5],
+      [47.5, 82.0],
+    ],
+    strokeColor: '#06B6D4', // Cyan
+    averageSpeedKmh: 55,
+    nominalTransitDays: 12,
+    gaugeSpecification: 'Full Intermodal Sync: 1435mm ⇄ 1520mm ⇄ Ro-Pax ⇄ 1435mm',
+    typicalAssetValueUsd: 85000,
+    activeSegmentDescription: 'End-to-end perishable digital twin covering 4,500 km across 5 nations with automated chokepoint optimization.',
+  },
+};
+
+// =============================================================================
+// 4. CORRIDOR EVENTS (CHOKEPOINTS, ANOMALIES, INTERVENTIONS)
+// =============================================================================
+
 export const CORRIDOR_EVENTS: CorridorEvent[] = [
   {
     id: 'EVT-101',
@@ -449,6 +604,7 @@ export const CORRIDOR_EVENTS: CorridorEvent[] = [
       vibration: 0.8,
       co2: 4.8,
       o2: 14.2,
+      ethylene: 4.2,
     },
     bhi: 48.2,
     rulHours: 28,
@@ -462,7 +618,7 @@ export const CORRIDOR_EVENTS: CorridorEvent[] = [
     severity: 'WARNING',
     lat: 41.2500,
     lng: 50.4000,
-    locationName: 'Caspian Sea Mid-Transit, Ro-Pax Ferry "Merkuriy-1"',
+    locationName: 'Caspian Sea Mid-Transit, Ro-Pax Ferry "BARYS-1"',
     timestamp: '42 min ago',
     description: 'Vessel auxiliary power bus showed 4% voltage sag, leading to intermittent compressor shutdown. Reefer temperature drifted upwards to +5.6°C (Target: +2°C to +4°C).',
     aiAction: 'Switched to internal lithium-iron-phosphate buffer battery. Alerted Alat Port engineering team to prepare dockside high-amperage reefer plug.',
@@ -473,6 +629,7 @@ export const CORRIDOR_EVENTS: CorridorEvent[] = [
       vibration: 0.6,
       co2: 1.2,
       o2: 19.5,
+      ethylene: 0.1,
     },
     bhi: 68.4,
     rulHours: 72,
@@ -497,6 +654,7 @@ export const CORRIDOR_EVENTS: CorridorEvent[] = [
       vibration: 0.9,
       co2: 5.1,
       o2: 12.0,
+      ethylene: 3.8,
     },
     bhi: 58.0,
     rulHours: 42,
@@ -517,6 +675,7 @@ export const CORRIDOR_EVENTS: CorridorEvent[] = [
       humidity: 84,
       ethanol: 0.0,
       vibration: 1.2,
+      ethylene: 0.2,
     },
     dcsaEventCode: 'DCSA-AIS-WEATHER-DELAY',
   },
@@ -535,6 +694,7 @@ export const CORRIDOR_EVENTS: CorridorEvent[] = [
       humidity: 75,
       ethanol: 5.1,
       vibration: 1.42,
+      ethylene: 0.4,
     },
     dcsaEventCode: 'DCSA-SHOCK-SURGE-02',
   },
@@ -557,6 +717,7 @@ export const CORRIDOR_EVENTS: CorridorEvent[] = [
       vibration: 0.4,
       co2: 6.0,
       o2: 3.5,
+      ethylene: 0.8,
     },
     bhi: 92.4,
     rulHours: 240,
@@ -572,3 +733,170 @@ export const SHIPMENT_GEO_POSITIONS: Record<string, { lat: number; lng: number; 
   'FS-6218': { lat: 42.1462, lng: 41.6720, mode: 'TRAIN' },   // Port of Poti
   'FS-3319': { lat: 40.9833, lng: 28.8167, mode: 'TRUCK' },   // Istanbul Hub
 };
+
+// =============================================================================
+// 5. VEHICLE ANIMATION & GEODESIC TRACK INTERPOLATION ENGINE
+// =============================================================================
+
+function calculateDistanceKm(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  const R = 6371; // Earth radius in km
+  const dLat = ((lat2 - lat1) * Math.PI) / 180;
+  const dLon = ((lon2 - lon1) * Math.PI) / 180;
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
+
+function calculateBearing(lat1: number, lon1: number, lat2: number, lon2: number): number {
+  const y = Math.sin(((lon2 - lon1) * Math.PI) / 180) * Math.cos((lat2 * Math.PI) / 180);
+  const x =
+    Math.cos((lat1 * Math.PI) / 180) * Math.sin((lat2 * Math.PI) / 180) -
+    Math.sin((lat1 * Math.PI) / 180) *
+      Math.cos((lat2 * Math.PI) / 180) *
+      Math.cos(((lon2 - lon1) * Math.PI) / 180);
+  const bearing = (Math.atan2(y, x) * 180) / Math.PI;
+  return (bearing + 360) % 360;
+}
+
+export interface TrackInterpolationResult {
+  lat: number;
+  lng: number;
+  bearingDegrees: number;
+  currentSegmentIndex: number;
+  totalDistanceKm: number;
+  distanceCoveredKm: number;
+}
+
+/**
+ * Accurately interpolates a vehicle position along an arbitrary polyline track
+ * at normalized progress t in [0, 1].
+ */
+export function interpolateTrackPosition(
+  coordinates: [number, number][],
+  progress: number
+): TrackInterpolationResult {
+  if (!coordinates || coordinates.length === 0) {
+    return {
+      lat: 43.18,
+      lng: 51.65,
+      bearingDegrees: 0,
+      currentSegmentIndex: 0,
+      totalDistanceKm: 0,
+      distanceCoveredKm: 0,
+    };
+  }
+
+  if (coordinates.length === 1) {
+    return {
+      lat: coordinates[0][0],
+      lng: coordinates[0][1],
+      bearingDegrees: 0,
+      currentSegmentIndex: 0,
+      totalDistanceKm: 0,
+      distanceCoveredKm: 0,
+    };
+  }
+
+  // Calculate cumulative segment distances
+  const segmentDistances: number[] = [];
+  let totalDistanceKm = 0;
+
+  for (let i = 0; i < coordinates.length - 1; i++) {
+    const d = calculateDistanceKm(
+      coordinates[i][0],
+      coordinates[i][1],
+      coordinates[i + 1][0],
+      coordinates[i + 1][1]
+    );
+    segmentDistances.push(d);
+    totalDistanceKm += d;
+  }
+
+  // Bound progress into [0, 1]
+  const clampedProgress = Math.max(0, Math.min(1, progress));
+  const targetDistance = clampedProgress * totalDistanceKm;
+
+  let accumulated = 0;
+  for (let i = 0; i < segmentDistances.length; i++) {
+    const segLen = segmentDistances[i];
+    if (accumulated + segLen >= targetDistance || i === segmentDistances.length - 1) {
+      const segProgress = segLen > 0 ? (targetDistance - accumulated) / segLen : 0;
+      const p1 = coordinates[i];
+      const p2 = coordinates[i + 1];
+
+      const lat = p1[0] + (p2[0] - p1[0]) * segProgress;
+      const lng = p1[1] + (p2[1] - p1[1]) * segProgress;
+      const bearingDegrees = calculateBearing(p1[0], p1[1], p2[0], p2[1]);
+
+      return {
+        lat: Number(lat.toFixed(5)),
+        lng: Number(lng.toFixed(5)),
+        bearingDegrees: Number(bearingDegrees.toFixed(1)),
+        currentSegmentIndex: i,
+        totalDistanceKm: Number(totalDistanceKm.toFixed(1)),
+        distanceCoveredKm: Number(targetDistance.toFixed(1)),
+      };
+    }
+    accumulated += segLen;
+  }
+
+  const last = coordinates[coordinates.length - 1];
+  return {
+    lat: last[0],
+    lng: last[1],
+    bearingDegrees: 0,
+    currentSegmentIndex: coordinates.length - 2,
+    totalDistanceKm: Number(totalDistanceKm.toFixed(1)),
+    distanceCoveredKm: Number(totalDistanceKm.toFixed(1)),
+  };
+}
+
+/**
+ * Returns primary track coordinates for a given transport mode.
+ */
+export function getTrackCoordinatesForMode(mode: TransportMode): [number, number][] {
+  switch (mode) {
+    case 'RAIL_REEFER': {
+      // Continuous rail path: Kazakhstan Mainline + BTK Trans-Caucasus + Trans-Anatolian
+      const kz = CORRIDOR_ROUTES.find((r) => r.id === 'kz-rail-mainline')?.coordinates ?? [];
+      const btk = CORRIDOR_ROUTES.find((r) => r.id === 'btk-trans-caucasus-rail')?.coordinates ?? [];
+      const tr = CORRIDOR_ROUTES.find((r) => r.id === 'trans-anatolian-rail')?.coordinates ?? [];
+      return [...kz, ...btk.slice(1), ...tr.slice(1)];
+    }
+    case 'RO_PAX_FERRY':
+      return CORRIDOR_ROUTES.find((r) => r.id === 'caspian-sea-ro-pax')?.coordinates ?? [];
+    case 'TIR_TRUCK':
+      return CORRIDOR_ROUTES.find((r) => r.id === 'we-wc-highway')?.coordinates ?? [];
+    case 'SMART_REEFER_CONTAINER':
+      return CORRIDOR_ROUTES.find((r) => r.id === 'black-sea-feeder')?.coordinates ?? [];
+    case 'MULTIMODAL_COMBO':
+      return MULTIMODAL_TRACK_COORDINATES;
+    default:
+      return MULTIMODAL_TRACK_COORDINATES;
+  }
+}
+
+// =============================================================================
+// 6. HELPER SELECTORS
+// =============================================================================
+
+export function getCorridorHub(id: string): MapWaypointHub | undefined {
+  return CORRIDOR_HUBS.find((h) => h.id.toLowerCase() === id.toLowerCase());
+}
+
+export function getGaugeBreakHubs(): MapWaypointHub[] {
+  return CORRIDOR_HUBS.filter((h) => h.isGaugeBreak);
+}
+
+export function getBottleneckHubs(): MapWaypointHub[] {
+  return CORRIDOR_HUBS.filter((h) => h.isBottleneck);
+}
+
+export function getModeConfig(mode: TransportMode): TransportModeConfig {
+  return TRANSPORT_MODES_CONFIG[mode] || TRANSPORT_MODES_CONFIG.MULTIMODAL_COMBO;
+}

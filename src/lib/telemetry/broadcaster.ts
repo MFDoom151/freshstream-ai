@@ -72,7 +72,10 @@ export class TelemetryBroadcasterHub extends EventEmitter {
   ): () => void {
     const eventName = shipmentId ? `telemetry:${shipmentId}` : 'telemetry';
     this.on(eventName, listener);
+    let unsubscribed = false;
     return () => {
+      if (unsubscribed) return;
+      unsubscribed = true;
       this.off(eventName, listener);
     };
   }
@@ -86,9 +89,33 @@ export class TelemetryBroadcasterHub extends EventEmitter {
   ): () => void {
     const eventName = shipmentId ? `alert:${shipmentId}` : 'alert';
     this.on(eventName, listener);
+    let unsubscribed = false;
     return () => {
+      if (unsubscribed) return;
+      unsubscribed = true;
       this.off(eventName, listener);
     };
+  }
+
+  /**
+   * Get active listener count for a specific shipment or global telemetry
+   */
+  public getTelemetryListenerCount(shipmentId?: string): number {
+    const eventName = shipmentId ? `telemetry:${shipmentId}` : 'telemetry';
+    return this.listenerCount(eventName);
+  }
+
+  /**
+   * Get total telemetry listener count across all registered events
+   */
+  public getTotalTelemetryListeners(): number {
+    let count = this.listenerCount('telemetry') + this.listenerCount('alert');
+    for (const eventName of this.eventNames()) {
+      if (typeof eventName === 'string' && (eventName.startsWith('telemetry:') || eventName.startsWith('alert:'))) {
+        count += this.listenerCount(eventName);
+      }
+    }
+    return count;
   }
 
   /**

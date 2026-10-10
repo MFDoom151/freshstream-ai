@@ -1,576 +1,1043 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 
-interface PearScrollytellingProps {
+/**
+ * 1. Apple-Grade Parametric 64x64 Organic Pear BufferGeometry
+ * 5-lobed natural carpellary modulation, organic belly slant, concave calyx and stem basin.
+ */
+export function createOrganicPearGeometry(): THREE.BufferGeometry {
+  const vSegments = 64; // vertical slices
+  const uSegments = 64; // radial sectors
+  const positions: number[] = [];
+  const uvs: number[] = [];
+  const indices: number[] = [];
+
+  for (let i = 0; i <= vSegments; i++) {
+    const v = i / vSegments; // 0.0 (calyx bottom) to 1.0 (stem top)
+    const y = (v - 0.5) * 2.7; // -1.35 to +1.35
+
+    // Realistic pear profile radius curve R(v)
+    let baseR = 0;
+    if (v < 0.06) {
+      // Calyx bottom cavity indent
+      baseR = Math.sin((v / 0.06) * (Math.PI * 0.5)) * 0.42;
+    } else if (v < 0.52) {
+      // Bulbous lower body (maximum width around v = 0.32)
+      const t = (v - 0.06) / 0.46;
+      baseR = 0.42 + Math.sin(t * Math.PI) * 0.88 * Math.pow(1.0 - t * 0.2, 0.6);
+    } else if (v < 0.72) {
+      // Graceful waist transition tapering into the neck
+      const t = (v - 0.52) / 0.20;
+      baseR = THREE.MathUtils.lerp(0.85, 0.48, Math.sin(t * Math.PI * 0.5));
+    } else if (v < 0.95) {
+      // Slender conical neck
+      const t = (v - 0.72) / 0.23;
+      baseR = THREE.MathUtils.lerp(0.48, 0.28, t);
+    } else {
+      // Top stem basin indent
+      const t = (v - 0.95) / 0.05;
+      baseR = THREE.MathUtils.lerp(0.28, 0.12, Math.pow(t, 0.5));
+    }
+
+    // Natural belly tilt offset (asymmetry along X)
+    const xBellyOffset = Math.sin(v * Math.PI) * 0.07;
+
+    for (let j = 0; j <= uSegments; j++) {
+      const u = j / uSegments;
+      const angle = u * Math.PI * 2;
+
+      // 5-lobed natural carpel cross-section modulation
+      const lobeMod = 1.0 + 0.035 * Math.cos(5 * angle) * (1.0 - v * 0.7);
+      // Gentle elliptical variance
+      const rX = baseR * lobeMod * 1.02;
+      const rZ = baseR * lobeMod * 0.98;
+
+      const px = Math.cos(angle) * rX + xBellyOffset;
+      const py = y;
+      const pz = Math.sin(angle) * rZ;
+
+      positions.push(px, py, pz);
+      uvs.push(u, v);
+    }
+  }
+
+  // Generate triangle faces
+  for (let i = 0; i < vSegments; i++) {
+    for (let j = 0; j < uSegments; j++) {
+      const a = i * (uSegments + 1) + j;
+      const b = (i + 1) * (uSegments + 1) + j;
+      const c = (i + 1) * (uSegments + 1) + (j + 1);
+      const d = i * (uSegments + 1) + (j + 1);
+      indices.push(a, b, d);
+      indices.push(b, c, d);
+    }
+  }
+
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+  geometry.setIndex(indices);
+  geometry.computeVertexNormals();
+  return geometry;
+}
+
+/**
+ * 2. Curved 3D Leaf Geometry with Central Midrib Crease
+ */
+export function createCurvedLeafGeometry(): THREE.BufferGeometry {
+  const uSegments = 24; // across width
+  const vSegments = 32; // along length
+  const positions: number[] = [];
+  const uvs: number[] = [];
+  const indices: number[] = [];
+
+  for (let i = 0; i <= vSegments; i++) {
+    const v = i / vSegments; // 0.0 (base) to 1.0 (tip)
+    // Leaf profile width (tear/elliptical shape)
+    const maxWidth = Math.sin(v * Math.PI * 0.85) * 0.45;
+    // Longitudinal arch: starts upwards, arches gracefully downwards
+    const y = Math.sin(v * Math.PI * 0.5) * 0.85;
+    const zArch = -Math.pow(v, 1.6) * 0.35;
+
+    for (let j = 0; j <= uSegments; j++) {
+      const u = j / uSegments; // 0.0 (left) to 1.0 (right)
+      const uCentered = (u - 0.5) * 2.0; // -1.0 to +1.0
+      const x = uCentered * maxWidth;
+
+      // Transverse V-crease along midrib (uCentered = 0)
+      const midribCrease = (1.0 - Math.abs(uCentered)) * 0.08;
+      const z = zArch + midribCrease;
+
+      positions.push(x, y, z);
+      uvs.push(u, v);
+    }
+  }
+
+  for (let i = 0; i < vSegments; i++) {
+    for (let j = 0; j < uSegments; j++) {
+      const a = i * (uSegments + 1) + j;
+      const b = (i + 1) * (uSegments + 1) + j;
+      const c = (i + 1) * (uSegments + 1) + (j + 1);
+      const d = i * (uSegments + 1) + (j + 1);
+      indices.push(a, b, d);
+      indices.push(b, c, d);
+    }
+  }
+
+  const geometry = new THREE.BufferGeometry();
+  geometry.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+  geometry.setAttribute('uv', new THREE.Float32BufferAttribute(uvs, 2));
+  geometry.setIndex(indices);
+  geometry.computeVertexNormals();
+  return geometry;
+}
+
+/**
+ * 3. GLSL Vertex Shader for Biological Rot & AI Digital Twin Recovery
+ */
+export const pearVertexShader = `
+  uniform float uTime;
+  uniform float uDecay;         // 0.0 (fresh) -> 1.0 (fully rotten)
+  uniform float uRestoration;   // 0.0 -> 1.0 (bio-twin time-reversal wave)
+
+  varying vec3 vNormal;
+  varying vec3 vPosition;
+  varying vec2 vUv;
+  varying float vRotMask;
+  varying float vDisplacement;
+
+  // Simplex 3D Noise utilities
+  vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+  vec4 mod289(vec4 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+  vec4 permute(vec4 x) { return mod289(((x * 34.0) + 1.0) * x); }
+  vec4 taylorInvSqrt(vec4 r) { return 1.79284291400159 - 0.85373472095314 * r; }
+
+  float snoise(vec3 v) {
+    const vec2 C = vec2(1.0/6.0, 1.0/3.0);
+    const vec4 D = vec4(0.0, 0.5, 1.0, 2.0);
+    vec3 i  = floor(v + dot(v, C.yyy));
+    vec3 x0 = v - i + dot(i, C.xxx);
+    vec3 g = step(x0.yzx, x0.xyz);
+    vec3 l = 1.0 - g;
+    vec3 i1 = min(g.xyz, l.zxy);
+    vec3 i2 = max(g.xyz, l.zxy);
+    vec3 x1 = x0 - i1 + C.xxx;
+    vec3 x2 = x0 - i2 + C.yyy;
+    vec3 x3 = x0 - D.yyy;
+    i = mod289(i);
+    vec4 p = permute(permute(permute(
+              i.z + vec4(0.0, i1.z, i2.z, 1.0))
+            + i.y + vec4(0.0, i1.y, i2.y, 1.0))
+            + i.x + vec4(0.0, i1.x, i2.x, 1.0));
+    float n_ = 0.142857142857;
+    vec3 ns = n_ * D.wyz - D.xzx;
+    vec4 j = p - 49.0 * floor(p * ns.z * ns.z);
+    vec4 x_ = floor(j * ns.z);
+    vec4 y_ = floor(j - 7.0 * x_);
+    vec4 x = x_ * ns.x + ns.yyyy;
+    vec4 y = y_ * ns.x + ns.yyyy;
+    vec4 h = 1.0 - abs(x) - abs(y);
+    vec4 b0 = vec4(x.xy, y.xy);
+    vec4 b1 = vec4(x.zw, y.zw);
+    vec4 s0 = floor(b0) * 2.0 + 1.0;
+    vec4 s1 = floor(b1) * 2.0 + 1.0;
+    vec4 sh = -step(h, vec4(0.0));
+    vec4 a0 = b0.xzyw + s0.xzyw * sh.xxyy;
+    vec4 a1 = b1.xzyw + s1.xzyw * sh.zzww;
+    vec3 p0 = vec3(a0.xy, h.x);
+    vec3 p1 = vec3(a0.zw, h.y);
+    vec3 p2 = vec3(a1.xy, h.z);
+    vec3 p3 = vec3(a1.zw, h.w);
+    vec4 norm = taylorInvSqrt(vec4(dot(p0,p0), dot(p1,p1), dot(p2, p2), dot(p3,p3)));
+    p0 *= norm.x; p1 *= norm.y; p2 *= norm.z; p3 *= norm.w;
+    vec4 m = max(0.6 - vec4(dot(x0,x0), dot(x1,x1), dot(x2,x2), dot(x3,x3)), 0.0);
+    m = m * m;
+    return 42.0 * dot(m * m, vec4(dot(p0,x0), dot(p1,x1), dot(p2,x2), dot(p3,x3)));
+  }
+
+  void main() {
+    vUv = uv;
+    vNormal = normalize(normalMatrix * normal);
+
+    // Localized necrotic lesion centers (cellular noise)
+    float lesionNoise = snoise(position * 2.4 + vec3(0.0, 0.4, 1.2));
+    float rotMask = smoothstep(0.1, 0.7, lesionNoise * 0.6 + (0.5 - uv.y * 0.3));
+    vRotMask = rotMask * uDecay;
+
+    // High-frequency epidermal dehydration wrinkles & sunken craters
+    float fineWrinkles = snoise(position * 8.5) * 0.04;
+    float deepCraters = snoise(position * 4.2) * 0.09;
+    float totalDeform = (fineWrinkles + deepCraters * rotMask) * uDecay;
+
+    // 10% volume loss during severe dehydration
+    float volumeShrink = 1.0 - (uDecay * 0.10);
+    vec3 displacedPos = (position * volumeShrink) - (normal * totalDeform);
+
+    // Biological digital twin restoration sweep (restrained, elegant wave)
+    if (uRestoration > 0.001) {
+      float wave = sin((position.y * 3.5) - (uTime * 3.0));
+      float pulse = smoothstep(0.6, 1.0, wave) * uRestoration * 0.02;
+      displacedPos += normal * pulse;
+    }
+
+    vPosition = (modelViewMatrix * vec4(displacedPos, 1.0)).xyz;
+    vDisplacement = totalDeform;
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(displacedPos, 1.0);
+  }
+`;
+
+/**
+ * 4. GLSL Fragment Shader for Bartlett/Asian Dual Tone, Lesions, Mold & Recovery
+ */
+export const pearFragmentShader = `
+  uniform float uTime;
+  uniform float uDecay;
+  uniform float uRestoration;
+  uniform vec3 uKeyLightPos;
+  uniform vec3 uFillLightPos;
+
+  varying vec3 vNormal;
+  varying vec3 vPosition;
+  varying vec2 vUv;
+  varying float vRotMask;
+  varying float vDisplacement;
+
+  // Procedural 2D hash for micro-lenticel skin pores
+  float hash21(vec2 p) {
+    p = fract(p * vec2(234.34, 435.345));
+    p += dot(p, p + 34.23);
+    return fract(p.x * p.y);
+  }
+
+  void main() {
+    vec3 N = normalize(vNormal);
+    vec3 V = normalize(-vPosition);
+    vec3 L1 = normalize(uKeyLightPos - vPosition);
+    vec3 L2 = normalize(uFillLightPos - vPosition);
+
+    // 1. Fresh Asian/Bartlett Pear Pigments
+    vec3 freshLime = vec3(0.50, 0.74, 0.24);    // Upper neck crisp green
+    vec3 freshGolden = vec3(0.92, 0.78, 0.26);  // Lower body golden honey
+    vec3 freshBlush = vec3(0.88, 0.42, 0.18);   // Delicate sun-kissed peach
+
+    vec3 baseFresh = mix(freshLime, freshGolden, clamp(1.0 - vUv.y * 0.8, 0.0, 1.0));
+    // Sun-kissed angular blush on one flank
+    float blushFactor = smoothstep(0.3, 0.8, dot(N, vec3(0.5, 0.3, 0.7)));
+    baseFresh = mix(baseFresh, freshBlush, blushFactor * 0.40);
+
+    // Natural micro-lenticels (tiny skin freckles)
+    float lenticels = step(0.91, hash21(vUv * 85.0)) * 0.14;
+    baseFresh -= vec3(lenticels * 0.25, lenticels * 0.18, 0.0);
+
+    // 2. Necrotic Decay & Mold Pigments
+    vec3 haloBrown = vec3(0.38, 0.22, 0.08);      // Browning halo around lesions
+    vec3 sunkenNecrotic = vec3(0.14, 0.07, 0.02); // Deep sunken rotten core
+    vec3 moldVelvet = vec3(0.88, 0.90, 0.92);     // Velvety grayish-white mycelium fuzz
+
+    // Composite necrotic lesions
+    vec3 decayColor = mix(baseFresh, haloBrown, smoothstep(0.15, 0.55, vRotMask));
+    decayColor = mix(decayColor, sunkenNecrotic, smoothstep(0.45, 0.85, vRotMask));
+
+    // Velvety mold spores bloom at centers of deep decay
+    float moldBloom = smoothstep(0.68, 0.95, vRotMask) * smoothstep(0.4, 0.8, uDecay);
+    decayColor = mix(decayColor, moldVelvet, moldBloom * 0.85);
+
+    vec3 albedo = mix(baseFresh, decayColor, uDecay);
+
+    // 3. Apple-Grade PBR Lighting
+    // Dual-source diffuse
+    float diff1 = max(dot(N, L1), 0.0);
+    float diff2 = max(dot(N, L2), 0.0) * 0.45;
+    vec3 diffuse = albedo * (diff1 * vec3(1.0, 0.98, 0.94) + diff2 * vec3(0.82, 0.90, 1.0) + 0.22);
+
+    // Subsurface Scattering (SSS) approximation on fresh tissue
+    vec3 sss = vec3(0.14, 0.18, 0.04) * max(0.0, dot(-N, L1) * 0.5 + 0.5) * (1.0 - uDecay);
+
+    // Microfacet Specular Sheen (Fresh = waxy gloss; Rotten = dull matte)
+    vec3 H1 = normalize(L1 + V);
+    float shininess = mix(36.0, 4.0, uDecay);
+    float specStrength = mix(0.38, 0.03, uDecay);
+    float spec = pow(max(dot(N, H1), 0.0), shininess) * specStrength;
+
+    // Studio Silhouette Rim
+    float fresnel = pow(1.0 - max(dot(N, V), 0.0), 3.0);
+    vec3 rim = vec3(0.98, 0.95, 0.85) * fresnel * mix(0.45, 0.10, uDecay);
+
+    vec3 finalColor = diffuse + sss + spec + rim;
+
+    // 4. Bio-Twin Time-Reversal Sweep (Subtle, elegant golden/mint wavefront)
+    if (uRestoration > 0.001) {
+      float waveFront = sin(vPosition.y * 5.0 - uTime * 4.0);
+      float glow = smoothstep(0.85, 1.0, waveFront) * uRestoration;
+      vec3 restorationGlow = vec3(0.10, 0.90, 0.55) * (glow * 0.6 + fresnel * 0.3);
+      finalColor += restorationGlow;
+    }
+
+    gl_FragColor = vec4(finalColor, 1.0);
+  }
+`;
+
+/**
+ * 5. Smart Insulated Cold-Chain Carton Model
+ */
+export interface SmartCartonMeshResult {
+  group: THREE.Group;
+  flapLeft: THREE.Group;
+  flapRight: THREE.Group;
+  ledIndicator: THREE.Mesh;
+  geometries: THREE.BufferGeometry[];
+  materials: THREE.Material[];
+}
+
+export function createSmartCartonMesh(): SmartCartonMeshResult {
+  const group = new THREE.Group();
+  const geometries: THREE.BufferGeometry[] = [];
+  const materials: THREE.Material[] = [];
+
+  // Main carton outer shell
+  const bodyGeo = new THREE.BoxGeometry(2.4, 2.0, 2.4);
+  geometries.push(bodyGeo);
+  const bodyMat = new THREE.MeshStandardMaterial({
+    color: 0x1e293b,
+    roughness: 0.45,
+    metalness: 0.15,
+  });
+  materials.push(bodyMat);
+  const bodyMesh = new THREE.Mesh(bodyGeo, bodyMat);
+  group.add(bodyMesh);
+
+  // Insulated silver reflective interior liner
+  const linerGeo = new THREE.BoxGeometry(2.2, 1.8, 2.2);
+  geometries.push(linerGeo);
+  const linerMat = new THREE.MeshStandardMaterial({
+    color: 0x94a3b8,
+    roughness: 0.25,
+    metalness: 0.75,
+  });
+  materials.push(linerMat);
+  const linerMesh = new THREE.Mesh(linerGeo, linerMat);
+  linerMesh.position.y = 0.05;
+  group.add(linerMesh);
+
+  // Protective cushion foam bed at the bottom
+  const foamGeo = new THREE.BoxGeometry(2.1, 0.4, 2.1);
+  geometries.push(foamGeo);
+  const foamMat = new THREE.MeshStandardMaterial({
+    color: 0x0f172a,
+    roughness: 0.85,
+    metalness: 0.05,
+  });
+  materials.push(foamMat);
+  const foamMesh = new THREE.Mesh(foamGeo, foamMat);
+  foamMesh.position.y = -0.7;
+  group.add(foamMesh);
+
+  // Flap Left Group (pivot at x = -1.2, y = 1.0)
+  const flapLeft = new THREE.Group();
+  flapLeft.position.set(-1.2, 1.0, 0);
+  const flapGeo = new THREE.BoxGeometry(1.2, 0.06, 2.38);
+  geometries.push(flapGeo);
+  const flapMat = new THREE.MeshStandardMaterial({
+    color: 0x334155,
+    roughness: 0.4,
+    metalness: 0.1,
+  });
+  materials.push(flapMat);
+  const flapLeftMesh = new THREE.Mesh(flapGeo, flapMat);
+  flapLeftMesh.position.set(0.6, 0, 0);
+  flapLeft.add(flapLeftMesh);
+  group.add(flapLeft);
+
+  // Flap Right Group (pivot at x = 1.2, y = 1.0)
+  const flapRight = new THREE.Group();
+  flapRight.position.set(1.2, 1.0, 0);
+  const flapRightMesh = new THREE.Mesh(flapGeo, flapMat);
+  flapRightMesh.position.set(-0.6, 0, 0);
+  flapRight.add(flapRightMesh);
+  group.add(flapRight);
+
+  // IoT Sensor Puck on carton front face (z = 1.24)
+  const puckGeo = new THREE.CylinderGeometry(0.24, 0.24, 0.08, 24);
+  puckGeo.rotateX(Math.PI / 2);
+  geometries.push(puckGeo);
+  const puckMat = new THREE.MeshStandardMaterial({
+    color: 0x0f172a,
+    roughness: 0.3,
+    metalness: 0.8,
+  });
+  materials.push(puckMat);
+  const puckMesh = new THREE.Mesh(puckGeo, puckMat);
+  puckMesh.position.set(0, 0, 1.24);
+  group.add(puckMesh);
+
+  // Mint IoT Indicator LED
+  const ledGeo = new THREE.SphereGeometry(0.05, 16, 16);
+  geometries.push(ledGeo);
+  const ledMat = new THREE.MeshStandardMaterial({
+    color: 0x10b981,
+    emissive: 0x10b981,
+    emissiveIntensity: 0.8,
+    roughness: 0.2,
+  });
+  materials.push(ledMat);
+  const ledIndicator = new THREE.Mesh(ledGeo, ledMat);
+  ledIndicator.position.set(0, 0, 1.29);
+  group.add(ledIndicator);
+
+  return {
+    group,
+    flapLeft,
+    flapRight,
+    ledIndicator,
+    geometries,
+    materials,
+  };
+}
+
+/**
+ * 6. Eurasian Refrigerated Semi-Trailer Truck Model
+ */
+export interface ReeferTruckMeshResult {
+  group: THREE.Group;
+  trailer: THREE.Mesh;
+  cabin: THREE.Mesh;
+  wheels: THREE.Mesh[];
+  geometries: THREE.BufferGeometry[];
+  materials: THREE.Material[];
+}
+
+export function createReeferTruckMesh(): ReeferTruckMeshResult {
+  const group = new THREE.Group();
+  const geometries: THREE.BufferGeometry[] = [];
+  const materials: THREE.Material[] = [];
+  const wheels: THREE.Mesh[] = [];
+
+  const trailerLength = 7.2;
+  const trailerHeight = 2.5;
+  const trailerWidth = 2.3;
+
+  // 1. Semi-Trailer Cargo Box
+  const trailerGeo = new THREE.BoxGeometry(trailerLength, trailerHeight, trailerWidth);
+  geometries.push(trailerGeo);
+  const trailerMat = new THREE.MeshStandardMaterial({
+    color: 0xe2e8f0,
+    roughness: 0.25,
+    metalness: 0.2,
+  });
+  materials.push(trailerMat);
+  const trailer = new THREE.Mesh(trailerGeo, trailerMat);
+  trailer.position.set(-1.1, 0.2, 0);
+  group.add(trailer);
+
+  // Dark aerodynamic chassis skirts
+  const skirtGeo = new THREE.BoxGeometry(trailerLength * 0.95, 0.35, trailerWidth + 0.04);
+  geometries.push(skirtGeo);
+  const skirtMat = new THREE.MeshStandardMaterial({
+    color: 0x0f172a,
+    roughness: 0.8,
+  });
+  materials.push(skirtMat);
+  const skirt = new THREE.Mesh(skirtGeo, skirtMat);
+  skirt.position.set(-1.1, -1.0, 0);
+  group.add(skirt);
+
+  // 2. Thermo King Refrigeration Cooling Unit on front bulkhead
+  const reeferUnitGeo = new THREE.BoxGeometry(0.5, 1.3, 1.8);
+  geometries.push(reeferUnitGeo);
+  const reeferUnitMat = new THREE.MeshStandardMaterial({
+    color: 0x0284c7,
+    roughness: 0.3,
+    metalness: 0.5,
+  });
+  materials.push(reeferUnitMat);
+  const reeferUnit = new THREE.Mesh(reeferUnitGeo, reeferUnitMat);
+  reeferUnit.position.set(-1.1 - trailerLength / 2 - 0.25, 0.45, 0);
+  group.add(reeferUnit);
+
+  // Status LED on reefer unit
+  const reeferLedGeo = new THREE.BoxGeometry(0.05, 0.12, 0.4);
+  geometries.push(reeferLedGeo);
+  const reeferLedMat = new THREE.MeshStandardMaterial({
+    color: 0x38bdf8,
+    emissive: 0x0284c7,
+    emissiveIntensity: 0.8,
+  });
+  materials.push(reeferLedMat);
+  const reeferLed = new THREE.Mesh(reeferLedGeo, reeferLedMat);
+  reeferLed.position.set(-1.1 - trailerLength / 2 - 0.51, 0.85, 0);
+  group.add(reeferLed);
+
+  // 3. Tractor Cabin (European Cab-Over Design)
+  const cabinGeo = new THREE.BoxGeometry(2.3, 2.5, 2.3);
+  geometries.push(cabinGeo);
+  const cabinMat = new THREE.MeshStandardMaterial({
+    color: 0x0f172a,
+    roughness: 0.25,
+    metalness: 0.85,
+  });
+  materials.push(cabinMat);
+  const cabin = new THREE.Mesh(cabinGeo, cabinMat);
+  cabin.position.set(-1.1 - trailerLength / 2 - 1.65, 0.15, 0);
+  group.add(cabin);
+
+  // Aerodynamic roof spoiler
+  const spoilerGeo = new THREE.BoxGeometry(1.6, 0.45, 2.2);
+  geometries.push(spoilerGeo);
+  const spoilerMesh = new THREE.Mesh(spoilerGeo, cabinMat);
+  spoilerMesh.position.set(-1.1 - trailerLength / 2 - 1.45, 1.5, 0);
+  group.add(spoilerMesh);
+
+  // Curved windshield
+  const windshieldGeo = new THREE.BoxGeometry(0.08, 0.95, 2.05);
+  geometries.push(windshieldGeo);
+  const windshieldMat = new THREE.MeshStandardMaterial({
+    color: 0x0ea5e9,
+    roughness: 0.1,
+    metalness: 0.9,
+    transparent: true,
+    opacity: 0.85,
+  });
+  materials.push(windshieldMat);
+  const windshield = new THREE.Mesh(windshieldGeo, windshieldMat);
+  windshield.position.set(-1.1 - trailerLength / 2 - 2.81, 0.65, 0);
+  group.add(windshield);
+
+  // Dual LED Headlights
+  const headlightGeo = new THREE.BoxGeometry(0.08, 0.18, 0.32);
+  geometries.push(headlightGeo);
+  const headlightMat = new THREE.MeshStandardMaterial({
+    color: 0xffffff,
+    emissive: 0xffffff,
+    emissiveIntensity: 2.5,
+  });
+  materials.push(headlightMat);
+  const headlightL = new THREE.Mesh(headlightGeo, headlightMat);
+  headlightL.position.set(-1.1 - trailerLength / 2 - 2.81, -0.6, 0.75);
+  const headlightR = new THREE.Mesh(headlightGeo, headlightMat);
+  headlightR.position.set(-1.1 - trailerLength / 2 - 2.81, -0.6, -0.75);
+  group.add(headlightL);
+  group.add(headlightR);
+
+  // 4. Wheels: 6 detailed rubber tires on silver alloy rims
+  const wheelTireGeo = new THREE.CylinderGeometry(0.44, 0.44, 0.34, 24);
+  wheelTireGeo.rotateX(Math.PI / 2);
+  geometries.push(wheelTireGeo);
+  const wheelTireMat = new THREE.MeshStandardMaterial({
+    color: 0x111827,
+    roughness: 0.9,
+  });
+  materials.push(wheelTireMat);
+
+  const wheelRimGeo = new THREE.CylinderGeometry(0.26, 0.26, 0.36, 16);
+  wheelRimGeo.rotateX(Math.PI / 2);
+  geometries.push(wheelRimGeo);
+  const wheelRimMat = new THREE.MeshStandardMaterial({
+    color: 0x94a3b8,
+    roughness: 0.25,
+    metalness: 0.85,
+  });
+  materials.push(wheelRimMat);
+
+  const wheelPositions: [number, number, number][] = [
+    [-1.1 - trailerLength / 2 - 1.8, -0.95, 1.15],
+    [-1.1 - trailerLength / 2 - 1.8, -0.95, -1.15],
+    [0.9, -0.95, 1.15],
+    [0.9, -0.95, -1.15],
+    [1.9, -0.95, 1.15],
+    [1.9, -0.95, -1.15],
+  ];
+
+  wheelPositions.forEach(([wx, wy, wz]) => {
+    const wheelGroup = new THREE.Mesh(wheelTireGeo, wheelTireMat);
+    const rim = new THREE.Mesh(wheelRimGeo, wheelRimMat);
+    wheelGroup.add(rim);
+    wheelGroup.position.set(wx, wy, wz);
+    group.add(wheelGroup);
+    wheels.push(wheelGroup);
+  });
+
+  return {
+    group,
+    trailer,
+    cabin,
+    wheels,
+    geometries,
+    materials,
+  };
+}
+
+/**
+ * 7. Pure Mathematical Scrollytelling State Machine
+ * Deterministic and 100% reversible across all 5 phases:
+ * Phase 1 (0.00 - 0.30): Fresh Pear
+ * Phase 2 (0.30 - 0.60): Biological Rot
+ * Phase 3 (0.60 - 0.75): AI Digital Twin Intervention & Reversal
+ * Phase 4 (0.75 - 0.90): Smart Encapsulation into Insulated Carton
+ * Phase 5 (0.90 - 1.00): Eurasian Reefer Semi-Trailer Dispatch
+ */
+export interface ScrollytellingState {
+  phase: 1 | 2 | 3 | 4 | 5;
+  phaseProgress: number;
+  pearVisible: boolean;
+  pearPosition: [number, number, number];
+  pearRotation: [number, number, number];
+  pearScale: [number, number, number];
+  uDecay: number;
+  uRestoration: number;
+  leafWilting: number;
+  cartonVisible: boolean;
+  cartonPosition: [number, number, number];
+  cartonScale: [number, number, number];
+  cartonFlapAngle: number;
+  cartonSealed: boolean;
+  truckVisible: boolean;
+  truckPosition: [number, number, number];
+  truckScale: [number, number, number];
+  wheelRotation: number;
+}
+
+export function computeScrollytellingState(pRaw: number, isDesktop: boolean = true): ScrollytellingState {
+  const p = Math.max(0.0, Math.min(1.0, pRaw));
+  const xOffset = isDesktop ? 1.8 : 0.0;
+  const yOffset = isDesktop ? 0.0 : 0.4;
+  const scaleMult = isDesktop ? 1.0 : 0.85;
+
+  if (p < 0.30) {
+    // --- PHASE 1: Fresh Pear (0.00 -> 0.30) ---
+    const norm = p / 0.30;
+    return {
+      phase: 1,
+      phaseProgress: norm,
+      pearVisible: true,
+      pearPosition: [xOffset, yOffset, 0.0],
+      pearRotation: [0.0, norm * 1.2, 0.0],
+      pearScale: [scaleMult, scaleMult, scaleMult],
+      uDecay: 0.0,
+      uRestoration: 0.0,
+      leafWilting: 0.0,
+      cartonVisible: false,
+      cartonPosition: [xOffset, -10.0, 0.0],
+      cartonScale: [0.001, 0.001, 0.001],
+      cartonFlapAngle: 1.3,
+      cartonSealed: false,
+      truckVisible: false,
+      truckPosition: [20.0, -1.0, -5.0],
+      truckScale: [0.001, 0.001, 0.001],
+      wheelRotation: 0.0,
+    };
+  } else if (p < 0.60) {
+    // --- PHASE 2: Biological Rot Progression (0.30 -> 0.60) ---
+    const norm = (p - 0.30) / 0.30;
+    return {
+      phase: 2,
+      phaseProgress: norm,
+      pearVisible: true,
+      pearPosition: [xOffset, yOffset - norm * 0.15, 0.0],
+      pearRotation: [norm * 0.25, 1.2 + norm * 1.1, norm * 0.1],
+      pearScale: [
+        scaleMult * (1.0 - norm * 0.08),
+        scaleMult * (1.0 - norm * 0.10),
+        scaleMult * (1.0 - norm * 0.08),
+      ],
+      uDecay: norm,
+      uRestoration: 0.0,
+      leafWilting: norm,
+      cartonVisible: false,
+      cartonPosition: [xOffset, -10.0, 0.0],
+      cartonScale: [0.001, 0.001, 0.001],
+      cartonFlapAngle: 1.3,
+      cartonSealed: false,
+      truckVisible: false,
+      truckPosition: [20.0, -1.0, -5.0],
+      truckScale: [0.001, 0.001, 0.001],
+      wheelRotation: 0.0,
+    };
+  } else if (p < 0.75) {
+    // --- PHASE 3: AI Digital Twin Recovery (0.60 -> 0.75) ---
+    const norm = (p - 0.60) / 0.15;
+    const decayRemaining = 1.0 - norm;
+    return {
+      phase: 3,
+      phaseProgress: norm,
+      pearVisible: true,
+      pearPosition: [xOffset, yOffset - decayRemaining * 0.15, 0.0],
+      pearRotation: [decayRemaining * 0.25, 2.3 + norm * 1.5, 0.0],
+      pearScale: [
+        scaleMult * (0.92 + norm * 0.08),
+        scaleMult * (0.90 + norm * 0.10),
+        scaleMult * (0.92 + norm * 0.08),
+      ],
+      uDecay: decayRemaining,
+      uRestoration: Math.sin(norm * Math.PI),
+      leafWilting: decayRemaining,
+      cartonVisible: false,
+      cartonPosition: [xOffset, -10.0, 0.0],
+      cartonScale: [0.001, 0.001, 0.001],
+      cartonFlapAngle: 1.3,
+      cartonSealed: false,
+      truckVisible: false,
+      truckPosition: [20.0, -1.0, -5.0],
+      truckScale: [0.001, 0.001, 0.001],
+      wheelRotation: 0.0,
+    };
+  } else if (p < 0.90) {
+    // --- PHASE 4: Packaging into Smart Insulated Carton (0.75 -> 0.90) ---
+    const norm = (p - 0.75) / 0.15;
+    const cartonRise = THREE.MathUtils.lerp(-4.5, -0.2, Math.min(1.0, norm * 1.4));
+    const pearLower = THREE.MathUtils.lerp(0.0, -0.4, Math.min(1.0, norm * 1.4));
+    
+    // Flaps open until norm > 0.5, then fold shut smoothly
+    let flapAngle = 1.3;
+    let sealed = false;
+    if (norm > 0.5) {
+      const closeT = (norm - 0.5) / 0.5;
+      flapAngle = (1.0 - closeT) * 1.3;
+      sealed = closeT >= 0.85;
+    }
+
+    return {
+      phase: 4,
+      phaseProgress: norm,
+      pearVisible: norm < 0.85,
+      pearPosition: [xOffset, yOffset + pearLower, 0.0],
+      pearRotation: [0.0, 3.8 + norm * 0.5, 0.0],
+      pearScale: [scaleMult * 0.85, scaleMult * 0.85, scaleMult * 0.85],
+      uDecay: 0.0,
+      uRestoration: 0.0,
+      leafWilting: 0.0,
+      cartonVisible: true,
+      cartonPosition: [xOffset, yOffset + cartonRise, 0.0],
+      cartonScale: [scaleMult, scaleMult, scaleMult],
+      cartonFlapAngle: flapAngle,
+      cartonSealed: sealed,
+      truckVisible: false,
+      truckPosition: [20.0, -1.0, -5.0],
+      truckScale: [0.001, 0.001, 0.001],
+      wheelRotation: 0.0,
+    };
+  } else {
+    // --- PHASE 5: Eurasian Reefer Semi-Trailer Dispatch (0.90 -> 1.00) ---
+    const norm = (p - 0.90) / 0.10;
+    
+    // Carton slides into truck cargo bay in first 35% of phase 5
+    const cartonInTruck = norm < 0.35;
+    const cartonSlideX = xOffset - norm * 3.5;
+    const cartonSlideZ = -norm * 1.8;
+
+    // Truck positioning & driving acceleration
+    let truckX = xOffset;
+    let truckZ = -1.2;
+    let wheelRot = 0.0;
+
+    if (norm < 0.30) {
+      // Truck pulling in
+      const arriveT = norm / 0.30;
+      truckX = THREE.MathUtils.lerp(xOffset + 5.0, xOffset, arriveT);
+      wheelRot = (xOffset + 5.0 - truckX) * 2.2;
+    } else {
+      // Truck accelerates along highway corridor into distance
+      const driveT = (norm - 0.30) / 0.70;
+      const dist = Math.pow(driveT, 2.0) * 32.0;
+      truckX = xOffset - dist;
+      truckZ = -1.2 - dist * 0.75;
+      wheelRot = 11.0 + dist * 2.5;
+    }
+
+    return {
+      phase: 5,
+      phaseProgress: norm,
+      pearVisible: false,
+      pearPosition: [xOffset, -10.0, 0.0],
+      pearRotation: [0.0, 0.0, 0.0],
+      pearScale: [0.001, 0.001, 0.001],
+      uDecay: 0.0,
+      uRestoration: 0.0,
+      leafWilting: 0.0,
+      cartonVisible: cartonInTruck,
+      cartonPosition: [cartonSlideX, yOffset - 0.2, cartonSlideZ],
+      cartonScale: [scaleMult * 0.75, scaleMult * 0.75, scaleMult * 0.75],
+      cartonFlapAngle: 0.0,
+      cartonSealed: true,
+      truckVisible: true,
+      truckPosition: [truckX, yOffset - 0.8, truckZ],
+      truckScale: [scaleMult * 0.85, scaleMult * 0.85, scaleMult * 0.85],
+      wheelRotation: wheelRot,
+    };
+  }
+}
+
+/**
+ * 8. Full-Viewport WebGL Component
+ */
+export interface PearScrollytellingProps {
   scrollProgress: number; // 0.0 to 1.0
   onProgressChange?: (progress: number) => void;
 }
 
 export const PearScrollytelling: React.FC<PearScrollytellingProps> = ({
   scrollProgress,
-  onProgressChange,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
-  const progressRef = useRef<number>(scrollProgress);
-  const [interactiveProgress, setInteractiveProgress] = useState<number>(scrollProgress);
-  const isUserScrubbing = useRef<boolean>(false);
+  const targetProgressRef = useRef<number>(scrollProgress);
+  const renderProgressRef = useRef<number>(scrollProgress);
 
-  // Sync ref with prop if not scrubbing manually
+  // Synchronize target progress
   useEffect(() => {
-    if (!isUserScrubbing.current) {
-      progressRef.current = scrollProgress;
-      setInteractiveProgress(scrollProgress);
-    }
+    targetProgressRef.current = scrollProgress;
   }, [scrollProgress]);
 
   useEffect(() => {
     if (!containerRef.current) return;
     const container = containerRef.current;
-    const width = container.clientWidth;
-    const height = container.clientHeight;
+
+    // Viewport dimensions
+    let width = window.innerWidth;
+    let height = window.innerHeight;
 
     // 1. Scene & Camera
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(42, width / height, 0.1, 100);
-    camera.position.set(0, 0, 7.2);
+    const camera = new THREE.PerspectiveCamera(40, width / height, 0.1, 100);
+    camera.position.set(0, 0, 7.5);
 
-    // 2. WebGL Renderer
+    // 2. WebGL Renderer with performance limits
     const renderer = new THREE.WebGLRenderer({
       antialias: true,
       alpha: true,
       powerPreference: 'high-performance',
     });
     renderer.setSize(width, height);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.2;
-    rendererRef.current = renderer;
+    renderer.toneMappingExposure = 1.15;
     container.innerHTML = '';
     container.appendChild(renderer.domElement);
 
-    // 3. Lighting
-    const ambientLight = new THREE.AmbientLight(0xdbeafe, 0.7);
+    // 3. Apple-Grade Studio Lighting
+    const ambientLight = new THREE.AmbientLight(0xf1f5f9, 0.8);
     scene.add(ambientLight);
 
-    const keyLight = new THREE.DirectionalLight(0xfffaed, 2.0);
-    keyLight.position.set(4, 5, 5);
+    const keyLight = new THREE.DirectionalLight(0xfffaed, 2.2);
+    keyLight.position.set(5.0, 6.0, 5.0);
     scene.add(keyLight);
 
-    const fillLight = new THREE.DirectionalLight(0x06b6d4, 1.0);
-    fillLight.position.set(-4, -2, 2);
+    const fillLight = new THREE.DirectionalLight(0xe0f2fe, 1.1);
+    fillLight.position.set(-5.0, -2.0, 3.0);
     scene.add(fillLight);
 
-    const rimLight = new THREE.DirectionalLight(0x10b981, 2.5);
-    rimLight.position.set(0, 4, -4);
+    const rimLight = new THREE.DirectionalLight(0x10b981, 1.8);
+    rimLight.position.set(0.0, 4.0, -4.0);
     scene.add(rimLight);
 
-    // 4. Procedural Pear Geometry
-    // Revolve a classic pear curve: wide bottom sphere tapering up to narrow neck
-    const pearPoints: THREE.Vector2[] = [];
-    const segments = 42;
-    for (let i = 0; i <= segments; i++) {
-      const t = i / segments;
-      const y = (t - 0.5) * 2.5; // -1.25 to +1.25
-      // Profile function: bulbous at bottom, waist in middle, tapered neck at top
-      let r = 0;
-      if (t < 0.6) {
-        // Bottom bulb
-        const bt = t / 0.6;
-        r = Math.sin(bt * Math.PI) * 1.15 * Math.pow(1.0 - t * 0.3, 0.5);
-        if (t < 0.08) {
-          // Bottom indent / calyx dimple
-          r = Math.sin((t / 0.08) * (Math.PI * 0.5)) * 0.45;
-        }
-      } else {
-        // Top neck
-        const nt = (t - 0.6) / 0.4;
-        r = (0.78 * (1.0 - nt * 0.65)) * Math.cos(nt * 0.5);
-        if (t > 0.96) {
-          // Top stem dimple
-          r *= (1.0 - (t - 0.96) / 0.04 * 0.5);
-        }
-      }
-      pearPoints.push(new THREE.Vector2(Math.max(0.01, r), y));
-    }
-    const pearGeometry = new THREE.LatheGeometry(pearPoints, 64);
-    pearGeometry.computeVertexNormals();
+    // 4. Geometry & Meshes
+    const allGeometries: THREE.BufferGeometry[] = [];
+    const allMaterials: THREE.Material[] = [];
 
-    // 5. Custom GLSL Shader for Biological Pear Decay & Reversal
-    const pearShaderMaterial = new THREE.ShaderMaterial({
+    // Pear Group
+    const pearGroup = new THREE.Group();
+    const pearGeo = createOrganicPearGeometry();
+    allGeometries.push(pearGeo);
+
+    const pearShaderMat = new THREE.ShaderMaterial({
       uniforms: {
         uTime: { value: 0 },
-        uDecay: { value: 0 },         // 0.0 (fresh) -> 1.0 (rotten)
-        uRestoration: { value: 0 },   // 0.0 -> 1.0 (bio-twin hologram restoration pulse)
-        uLightPos: { value: new THREE.Vector3(4, 5, 5) },
+        uDecay: { value: 0 },
+        uRestoration: { value: 0 },
+        uKeyLightPos: { value: keyLight.position },
+        uFillLightPos: { value: fillLight.position },
       },
-      vertexShader: `
-        uniform float uTime;
-        uniform float uDecay;
-        uniform float uRestoration;
-        varying vec3 vNormal;
-        varying vec3 vPosition;
-        varying vec2 vUv;
-        varying float vDisplacement;
-
-        // Simplex Noise 3D helper
-        vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
-        vec4 mod289(vec4 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
-        vec4 permute(vec4 x) { return mod289(((x*34.0)+1.0)*x); }
-        vec4 taylorInvSqrt(vec4 r) { return 1.79284291400159 - 0.85373472095314 * r; }
-
-        float snoise(vec3 v) {
-          const vec2 C = vec2(1.0/6.0, 1.0/3.0);
-          const vec4 D = vec4(0.0, 0.5, 1.0, 2.0);
-          vec3 i  = floor(v + dot(v, C.yyy));
-          vec3 x0 = v - i + dot(i, C.xxx);
-          vec3 g = step(x0.yzx, x0.xyz);
-          vec3 l = 1.0 - g;
-          vec3 i1 = min(g.xyz, l.zxy);
-          vec3 i2 = max(g.xyz, l.zxy);
-          vec3 x1 = x0 - i1 + C.xxx;
-          vec3 x2 = x0 - i2 + C.yyy;
-          vec3 x3 = x0 - D.yyy;
-          i = mod289(i);
-          vec4 p = permute(permute(permute(
-                    i.z + vec4(0.0, i1.z, i2.z, 1.0))
-                  + i.y + vec4(0.0, i1.y, i2.y, 1.0))
-                  + i.x + vec4(0.0, i1.x, i2.x, 1.0));
-          float n_ = 0.142857142857;
-          vec3 ns = n_ * D.wyz - D.xzx;
-          vec4 j = p - 49.0 * floor(p * ns.z * ns.z);
-          vec4 x_ = floor(j * ns.z);
-          vec4 y_ = floor(j - 7.0 * x_);
-          vec4 x = x_ *ns.x + ns.yyyy;
-          vec4 y = y_ *ns.x + ns.yyyy;
-          vec4 h = 1.0 - abs(x) - abs(y);
-          vec4 b0 = vec4(x.xy, y.xy);
-          vec4 b1 = vec4(x.zw, y.zw);
-          vec4 s0 = floor(b0)*2.0 + 1.0;
-          vec4 s1 = floor(b1)*2.0 + 1.0;
-          vec4 sh = -step(h, vec4(0.0));
-          vec4 a0 = b0.xzyw + s0.xzyw*sh.xxyy;
-          vec4 a1 = b1.xzyw + s1.xzyw*sh.zzww;
-          vec3 p0 = vec3(a0.xy, h.x);
-          vec3 p1 = vec3(a0.zw, h.y);
-          vec3 p2 = vec3(a1.xy, h.z);
-          vec3 p3 = vec3(a1.zw, h.w);
-          vec4 norm = taylorInvSqrt(vec4(dot(p0,p0), dot(p1,p1), dot(p2, p2), dot(p3,p3)));
-          p0 *= norm.x; p1 *= norm.y; p2 *= norm.z; p3 *= norm.w;
-          vec4 m = max(0.6 - vec4(dot(x0,x0), dot(x1,x1), dot(x2,x2), dot(x3,x3)), 0.0);
-          m = m * m;
-          return 42.0 * dot(m*m, vec4(dot(p0,x0), dot(p1,x1), dot(p2,x2), dot(p3,x3)));
-        }
-
-        void main() {
-          vUv = uv;
-          vNormal = normalize(normalMatrix * normal);
-          
-          // Compute biological decay deformation: wrinkling, caving-in, desiccating
-          float nRough = snoise(position * 3.5 + vec3(0.0, 0.0, 1.2));
-          float nFolds = snoise(position * 7.0);
-          float decayDeform = (nRough * 0.16 + nFolds * 0.08) * uDecay;
-          
-          // Shrinkage towards core when rotten
-          float shrink = 1.0 - (uDecay * 0.12);
-          
-          vec3 displacedPos = (position * shrink) - (normal * decayDeform);
-          
-          // Bio-twin holographic quantum scan pulse
-          if (uRestoration > 0.01) {
-            float scanPulse = sin(position.y * 12.0 - uTime * 3.5);
-            displacedPos += normal * (scanPulse * 0.015 * uRestoration);
-          }
-
-          vPosition = (modelViewMatrix * vec4(displacedPos, 1.0)).xyz;
-          vDisplacement = decayDeform;
-          gl_Position = projectionMatrix * modelViewMatrix * vec4(displacedPos, 1.0);
-        }
-      `,
-      fragmentShader: `
-        uniform float uTime;
-        uniform float uDecay;
-        uniform float uRestoration;
-        uniform vec3 uLightPos;
-        varying vec3 vNormal;
-        varying vec3 vPosition;
-        varying vec2 vUv;
-        varying float vDisplacement;
-
-        // Simple 2D procedural noise for skin pores
-        float hash(vec2 p) {
-          p = fract(p * vec2(123.34, 456.21));
-          p += dot(p, p + 45.32);
-          return fract(p.x * p.y);
-        }
-
-        void main() {
-          vec3 normal = normalize(vNormal);
-          vec3 viewDir = normalize(-vPosition);
-          vec3 lightDir = normalize(uLightPos - vPosition);
-
-          // 1. Fresh Pear Colors (Bartlett / Asian golden-green with blush)
-          vec3 freshLime = vec3(0.52, 0.79, 0.22);
-          vec3 freshGold = vec3(0.88, 0.78, 0.28);
-          vec3 blushRed = vec3(0.86, 0.38, 0.20);
-          
-          // Gradient based on height and sunlight angle
-          float heightFactor = clamp(vUv.y, 0.0, 1.0);
-          vec3 freshBase = mix(freshLime, freshGold, heightFactor);
-          float blush = smoothstep(0.4, 0.9, dot(normal, vec3(0.6, 0.3, 0.7))) * (1.0 - heightFactor * 0.5);
-          freshBase = mix(freshBase, blushRed, blush * 0.45);
-
-          // Micro pores (lenticels) on fresh skin
-          float pores = step(0.92, hash(vUv * 90.0)) * 0.12;
-          freshBase -= vec3(pores * 0.3, pores * 0.2, 0.0);
-
-          // 2. Rotten Pear Colors (Necrotic brown, black fungal bruising, grayish mold spores)
-          vec3 bruiseBrown = vec3(0.38, 0.22, 0.09);
-          vec3 deepRot = vec3(0.14, 0.07, 0.03);
-          vec3 moldSpore = vec3(0.45, 0.56, 0.50);
-
-          // Rot distribution mask
-          float rotMask = clamp(vDisplacement * 6.0 + (1.0 - heightFactor) * 0.5 + hash(vUv * 18.0) * 0.3, 0.0, 1.0);
-          rotMask = smoothstep(0.15, 0.85, rotMask * uDecay * 1.4);
-
-          vec3 rottenColor = mix(freshBase, bruiseBrown, uDecay);
-          rottenColor = mix(rottenColor, deepRot, rotMask);
-          
-          // Fungal fuzzy bloom patches
-          float moldPatch = smoothstep(0.65, 0.95, hash(vUv * 28.0) + rotMask * 0.6) * uDecay;
-          rottenColor = mix(rottenColor, moldSpore, moldPatch * 0.75);
-
-          // 3. Diffuse & Specular Lighting
-          float diff = max(dot(normal, lightDir), 0.0);
-          vec3 halfDir = normalize(lightDir + viewDir);
-          
-          // Fresh pear has soft waxy specular sheen; rotten becomes dull/matte
-          float shininess = mix(32.0, 4.0, uDecay);
-          float specIntensity = mix(0.35, 0.04, uDecay);
-          float spec = pow(max(dot(normal, halfDir), 0.0), shininess) * specIntensity;
-
-          // Subtle subsurface scattering simulation
-          vec3 sss = vec3(0.12, 0.18, 0.04) * max(0.0, dot(-normal, lightDir) * 0.5 + 0.5) * (1.0 - uDecay);
-
-          // Fresnel cyber rim
-          float fresnel = pow(1.0 - max(dot(normal, viewDir), 0.0), 3.0);
-          vec3 rimColor = mix(vec3(0.1, 0.8, 0.4), vec3(0.2, 0.1, 0.05), uDecay);
-
-          vec3 finalColor = (rottenColor * (diff + 0.25) + sss + spec) + (rimColor * fresnel * 0.4);
-
-          // 4. Bio-Twin Digital Reconstruction & Holo Mesh Pulse
-          if (uRestoration > 0.01) {
-            float scanWave = sin(vPosition.y * 18.0 - uTime * 4.0);
-            float scanIntensity = smoothstep(0.85, 1.0, scanWave);
-            
-            // Emerald holographic grid lines
-            vec3 holoGlow = vec3(0.06, 0.95, 0.62) * (scanIntensity * 1.8 + fresnel * 0.8);
-            finalColor = mix(finalColor, finalColor + holoGlow, uRestoration * 0.85);
-          }
-
-          gl_FragColor = vec4(finalColor, 1.0);
-        }
-      `,
+      vertexShader: pearVertexShader,
+      fragmentShader: pearFragmentShader,
     });
+    allMaterials.push(pearShaderMat);
 
-    // Pear Mesh Group
-    const pearGroup = new THREE.Group();
-    const pearMesh = new THREE.Mesh(pearGeometry, pearShaderMaterial);
+    const pearMesh = new THREE.Mesh(pearGeo, pearShaderMat);
     pearGroup.add(pearMesh);
 
-    // Stem: Curved wood cylinder at top
+    // Stem: Catmull-Rom spline with fibrous woody material
     const stemCurve = new THREE.CatmullRomCurve3([
-      new THREE.Vector3(0, 1.25, 0),
-      new THREE.Vector3(0.06, 1.55, 0.04),
-      new THREE.Vector3(0.18, 1.85, 0.12),
+      new THREE.Vector3(0.03, 1.28, -0.01),
+      new THREE.Vector3(0.06, 1.50, 0.02),
+      new THREE.Vector3(0.12, 1.70, 0.07),
+      new THREE.Vector3(0.22, 1.88, 0.13),
     ]);
-    const stemGeometry = new THREE.TubeGeometry(stemCurve, 16, 0.045, 8, false);
-    const stemMaterial = new THREE.MeshStandardMaterial({
+    const stemGeo = new THREE.TubeGeometry(stemCurve, 20, 0.045, 10, false);
+    allGeometries.push(stemGeo);
+    const stemMat = new THREE.MeshStandardMaterial({
       color: 0x4a2e16,
-      roughness: 0.9,
-      metalness: 0.1,
+      roughness: 0.92,
+      metalness: 0.08,
     });
-    const stemMesh = new THREE.Mesh(stemGeometry, stemMaterial);
+    allMaterials.push(stemMat);
+    const stemMesh = new THREE.Mesh(stemGeo, stemMat);
     pearGroup.add(stemMesh);
 
-    // Leaf: Organic curved petal attached to stem
-    const leafShape = new THREE.Shape();
-    leafShape.moveTo(0, 0);
-    leafShape.quadraticCurveTo(0.22, 0.25, 0.35, 0.7);
-    leafShape.quadraticCurveTo(0.12, 0.55, 0, 0.4);
-    leafShape.quadraticCurveTo(-0.12, 0.55, -0.35, 0.7);
-    leafShape.quadraticCurveTo(-0.22, 0.25, 0, 0);
-    const leafGeo = new THREE.ShapeGeometry(leafShape);
+    // Leaf: Double-curved 3D leaf with midrib crease
+    const leafGeo = createCurvedLeafGeometry();
+    allGeometries.push(leafGeo);
     const leafMat = new THREE.MeshStandardMaterial({
-      color: 0x15803d,
-      roughness: 0.4,
-      metalness: 0.1,
+      color: 0x16a34a,
+      roughness: 0.35,
+      metalness: 0.05,
       side: THREE.DoubleSide,
     });
+    allMaterials.push(leafMat);
     const leafMesh = new THREE.Mesh(leafGeo, leafMat);
-    leafMesh.position.set(0.12, 1.65, 0.08);
-    leafMesh.rotation.set(0.4, 0.8, -0.5);
-    leafMesh.scale.set(0.7, 0.7, 0.7);
+    leafMesh.position.set(0.10, 1.62, 0.06);
+    leafMesh.rotation.set(0.3, 0.7, -0.4);
     pearGroup.add(leafMesh);
 
     scene.add(pearGroup);
 
-    // 6. Smart Reefer Insulation Crate (Box)
-    const crateGroup = new THREE.Group();
-    const crateSize = 2.8;
-    const crateBodyGeo = new THREE.BoxGeometry(crateSize, crateSize * 0.9, crateSize);
-    const crateBodyMat = new THREE.MeshStandardMaterial({
-      color: 0x0f172a, // Navy slate
-      roughness: 0.3,
-      metalness: 0.8,
-    });
-    const crateBody = new THREE.Mesh(crateBodyGeo, crateBodyMat);
-    crateGroup.add(crateBody);
+    // 5. Smart Insulated Carton
+    const cartonObj = createSmartCartonMesh();
+    allGeometries.push(...cartonObj.geometries);
+    allMaterials.push(...cartonObj.materials);
+    scene.add(cartonObj.group);
 
-    // Edge Protectors & Gaskets
-    const edgeGeo = new THREE.BoxGeometry(crateSize + 0.06, 0.08, crateSize + 0.06);
-    const edgeMat = new THREE.MeshStandardMaterial({
-      color: 0x10b981, // Emerald neon gasket
-      emissive: 0x059669,
-      emissiveIntensity: 0.5,
-      roughness: 0.2,
-    });
-    const edgeTop = new THREE.Mesh(edgeGeo, edgeMat);
-    edgeTop.position.y = (crateSize * 0.9) / 2;
-    crateGroup.add(edgeTop);
+    // 6. Eurasian Refrigerated Semi-Trailer Truck
+    const truckObj = createReeferTruckMesh();
+    allGeometries.push(...truckObj.geometries);
+    allMaterials.push(...truckObj.materials);
+    scene.add(truckObj.group);
 
-    // Crate Lid (Opens and closes smoothly)
-    const lidGeo = new THREE.BoxGeometry(crateSize + 0.04, 0.2, crateSize + 0.04);
-    const lidMat = new THREE.MeshStandardMaterial({
-      color: 0x1e293b,
-      roughness: 0.4,
-      metalness: 0.7,
-    });
-    const crateLid = new THREE.Mesh(lidGeo, lidMat);
-    crateLid.position.set(0, (crateSize * 0.9) / 2 + 0.1, 0);
-    crateGroup.add(crateLid);
-
-    // Initial state: crate hidden below screen
-    crateGroup.position.set(0, -10, 0);
-    crateGroup.scale.set(0.001, 0.001, 0.001);
-    scene.add(crateGroup);
-
-    // 7. Refrigerated Cargo Truck (Reefer Semi-Trailer)
-    const truckGroup = new THREE.Group();
-
-    // Trailer Box
-    const trailerLength = 6.2;
-    const trailerHeight = 2.4;
-    const trailerWidth = 2.2;
-    const trailerGeo = new THREE.BoxGeometry(trailerLength, trailerHeight, trailerWidth);
-    const trailerMat = new THREE.MeshStandardMaterial({
-      color: 0x0b1329,
-      roughness: 0.2,
-      metalness: 0.7,
-    });
-    const trailer = new THREE.Mesh(trailerGeo, trailerMat);
-    trailer.position.set(-1.0, 0, 0);
-    truckGroup.add(trailer);
-
-    // Reefer Cooling Unit (Mounted on front bulkhead)
-    const reeferUnitGeo = new THREE.BoxGeometry(0.5, 1.2, 1.6);
-    const reeferUnitMat = new THREE.MeshStandardMaterial({
-      color: 0x38bdf8,
-      emissive: 0x0284c7,
-      emissiveIntensity: 0.4,
-      roughness: 0.3,
-    });
-    const reeferUnit = new THREE.Mesh(reeferUnitGeo, reeferUnitMat);
-    reeferUnit.position.set(-1.0 - trailerLength / 2 - 0.25, 0.3, 0);
-    truckGroup.add(reeferUnit);
-
-    // Truck Cabin (Front)
-    const cabinGeo = new THREE.BoxGeometry(2.2, 2.2, 2.1);
-    const cabinMat = new THREE.MeshStandardMaterial({
-      color: 0x10b981, // Emerald green cab
-      roughness: 0.3,
-      metalness: 0.6,
-    });
-    const cabin = new THREE.Mesh(cabinGeo, cabinMat);
-    cabin.position.set(-1.0 - trailerLength / 2 - 1.5, -0.1, 0);
-    truckGroup.add(cabin);
-
-    // Windshield
-    const windshieldGeo = new THREE.BoxGeometry(0.1, 0.9, 1.8);
-    const windshieldMat = new THREE.MeshStandardMaterial({
-      color: 0x0369a1,
-      roughness: 0.1,
-      metalness: 0.9,
-    });
-    const windshield = new THREE.Mesh(windshieldGeo, windshieldMat);
-    windshield.position.set(-1.0 - trailerLength / 2 - 2.56, 0.35, 0);
-    truckGroup.add(windshield);
-
-    // Headlights
-    const lightGeo = new THREE.BoxGeometry(0.1, 0.2, 0.3);
-    const lightMat = new THREE.MeshStandardMaterial({
-      color: 0xffffff,
-      emissive: 0xffffff,
-      emissiveIntensity: 3.0,
-    });
-    const leftLight = new THREE.Mesh(lightGeo, lightMat);
-    leftLight.position.set(-1.0 - trailerLength / 2 - 2.56, -0.6, 0.65);
-    const rightLight = new THREE.Mesh(lightGeo, lightMat);
-    rightLight.position.set(-1.0 - trailerLength / 2 - 2.56, -0.6, -0.65);
-    truckGroup.add(leftLight);
-    truckGroup.add(rightLight);
-
-    // Wheels (8 wheels)
-    const wheelGeo = new THREE.CylinderGeometry(0.42, 0.42, 0.35, 24);
-    wheelGeo.rotateX(Math.PI / 2);
-    const wheelMat = new THREE.MeshStandardMaterial({
-      color: 0x090d16,
-      roughness: 0.9,
-    });
-
-    const wheelPositions = [
-      [-1.0 - trailerLength / 2 - 1.6, -1.2, 1.1],
-      [-1.0 - trailerLength / 2 - 1.6, -1.2, -1.1],
-      [1.0, -1.2, 1.1],
-      [1.0, -1.2, -1.1],
-      [1.9, -1.2, 1.1],
-      [1.9, -1.2, -1.1],
-    ];
-    wheelPositions.forEach(([wx, wy, wz]) => {
-      const wheel = new THREE.Mesh(wheelGeo, wheelMat);
-      wheel.position.set(wx, wy, wz);
-      truckGroup.add(wheel);
-    });
-
-    // Initial state: truck off-screen
-    truckGroup.position.set(20, -1.0, -5);
-    truckGroup.scale.set(0.001, 0.001, 0.001);
-    scene.add(truckGroup);
-
-    // 8. Animation & Render Loop
+    // 7. Animation & Render Loop with Exponential Moving Average Damping
     let animationFrameId: number;
-    let clock = new THREE.Clock();
+    const clock = new THREE.Clock();
 
     const animate = () => {
       animationFrameId = requestAnimationFrame(animate);
       const elapsedTime = clock.getElapsedTime();
-      const p = progressRef.current;
 
-      pearShaderMaterial.uniforms.uTime.value = elapsedTime;
+      // Exponential moving average damping: silky 60fps inertia
+      const targetP = targetProgressRef.current;
+      renderProgressRef.current += (targetP - renderProgressRef.current) * 0.08;
+      const currentP = renderProgressRef.current;
 
-      // STAGE LOGIC BASED ON SCROLL PROGRESS (0.0 to 1.0)
-      if (p < 0.22) {
-        // --- PHASE 1: Fresh Pristine Pear (0.00 -> 0.22) ---
-        // Floating fresh pear, subtle organic wobble
-        pearShaderMaterial.uniforms.uDecay.value = 0.0;
-        pearShaderMaterial.uniforms.uRestoration.value = 0.0;
+      const isDesktop = window.innerWidth >= 1024;
+      const state = computeScrollytellingState(currentP, isDesktop);
 
-        pearGroup.visible = true;
-        pearGroup.position.set(1.5, Math.sin(elapsedTime * 1.2) * 0.15, 0);
-        pearGroup.rotation.y = elapsedTime * 0.4;
-        pearGroup.rotation.z = Math.sin(elapsedTime * 0.8) * 0.08;
-        pearGroup.scale.set(1.0, 1.0, 1.0);
+      // Update shader uniforms
+      pearShaderMat.uniforms.uTime.value = elapsedTime;
+      pearShaderMat.uniforms.uDecay.value = state.uDecay;
+      pearShaderMat.uniforms.uRestoration.value = state.uRestoration;
 
-        crateGroup.visible = false;
-        truckGroup.visible = false;
-      } 
-      else if (p >= 0.22 && p < 0.65) {
-        // --- PHASE 2: Spoilage & Thermal Decay (0.22 -> 0.65) ---
-        // Pear rots, bruises, caves in and shrivels
-        const decayNorm = (p - 0.22) / (0.65 - 0.22);
-        pearShaderMaterial.uniforms.uDecay.value = Math.min(1.0, decayNorm * 1.1);
-        pearShaderMaterial.uniforms.uRestoration.value = 0.0;
+      // Update Pear Mesh Group
+      pearGroup.visible = state.pearVisible;
+      if (state.pearVisible) {
+        // Natural hovering float
+        const hoverFloat = Math.sin(elapsedTime * 1.2) * 0.08;
+        pearGroup.position.set(
+          state.pearPosition[0],
+          state.pearPosition[1] + hoverFloat,
+          state.pearPosition[2]
+        );
+        pearGroup.rotation.set(
+          state.pearRotation[0],
+          state.pearRotation[1],
+          state.pearRotation[2]
+        );
+        pearGroup.scale.set(
+          state.pearScale[0],
+          state.pearScale[1],
+          state.pearScale[2]
+        );
 
-        pearGroup.visible = true;
-        // Agitated, uneasy shuddering motion as it decays
-        const jitter = Math.sin(elapsedTime * 14.0) * 0.02 * decayNorm;
-        pearGroup.position.set(1.5 + jitter, Math.sin(elapsedTime * 0.8) * 0.1 - decayNorm * 0.2, 0);
-        pearGroup.rotation.y = 0.8 + decayNorm * 1.2 + jitter * 2.0;
-        pearGroup.rotation.x = decayNorm * 0.35;
-        pearGroup.scale.set(1.0 - decayNorm * 0.15, 1.0 - decayNorm * 0.18, 1.0 - decayNorm * 0.15);
+        // Dynamic Leaf Wilting
+        const wilt = state.leafWilting;
+        leafMesh.rotation.set(0.3 + wilt * 0.7, 0.7 - wilt * 0.3, -0.4 - wilt * 0.5);
+        leafMesh.scale.set(1.0 - wilt * 0.25, 1.0 - wilt * 0.3, 1.0 - wilt * 0.2);
+        leafMat.color.lerpColors(new THREE.Color(0x16a34a), new THREE.Color(0x5a481c), wilt);
+      }
 
-        crateGroup.visible = false;
-        truckGroup.visible = false;
-      } 
-      else if (p >= 0.65 && p < 0.82) {
-        // --- PHASE 3: AI Digital Twin Intervention & Reversal (0.65 -> 0.82) ---
-        // Reverse decay! Holographic scan restores pear back to 100% fresh
-        const restoreNorm = (p - 0.65) / (0.82 - 0.65);
-        pearShaderMaterial.uniforms.uDecay.value = Math.max(0.0, 1.0 - restoreNorm * 1.2);
-        pearShaderMaterial.uniforms.uRestoration.value = Math.sin(restoreNorm * Math.PI) * 1.0;
+      // Update Smart Carton
+      cartonObj.group.visible = state.cartonVisible;
+      if (state.cartonVisible) {
+        cartonObj.group.position.set(
+          state.cartonPosition[0],
+          state.cartonPosition[1],
+          state.cartonPosition[2]
+        );
+        cartonObj.group.scale.set(
+          state.cartonScale[0],
+          state.cartonScale[1],
+          state.cartonScale[2]
+        );
 
-        pearGroup.visible = true;
-        pearGroup.position.set(1.5 * (1.0 - restoreNorm * 0.5), 0, 0);
-        pearGroup.rotation.y = elapsedTime * 1.5;
-        pearGroup.rotation.x = 0;
-        const currentScale = 0.85 + restoreNorm * 0.15;
-        pearGroup.scale.set(currentScale, currentScale, currentScale);
+        // Animate flaps
+        cartonObj.flapLeft.rotation.z = state.cartonFlapAngle;
+        cartonObj.flapRight.rotation.z = -state.cartonFlapAngle;
 
-        crateGroup.visible = false;
-        truckGroup.visible = false;
-      } 
-      else if (p >= 0.82 && p < 0.92) {
-        // --- PHASE 4: Packaging into Smart Insulated Crate (0.82 -> 0.92) ---
-        // Fresh pear drops inside the high-tech crate, lid seals
-        const packNorm = (p - 0.82) / (0.92 - 0.82);
-        pearShaderMaterial.uniforms.uDecay.value = 0.0;
-        pearShaderMaterial.uniforms.uRestoration.value = 0.0;
-
-        crateGroup.visible = true;
-        // Crate animates up to center
-        const crateY = THREE.MathUtils.lerp(-4.0, 0.0, Math.min(1.0, packNorm * 1.5));
-        const crateScale = THREE.MathUtils.lerp(0.2, 1.0, Math.min(1.0, packNorm * 1.5));
-        crateGroup.position.set(0, crateY, 0);
-        crateGroup.scale.set(crateScale, crateScale, crateScale);
-        crateGroup.rotation.y = packNorm * 0.8;
-
-        // Pear lowers into crate
-        pearGroup.visible = packNorm < 0.75;
-        pearGroup.position.set(0, 1.2 - packNorm * 1.8, 0);
-        pearGroup.scale.set(0.65, 0.65, 0.65);
-
-        // Lid closes when pear is inside
-        if (packNorm > 0.55) {
-          const lidClose = (packNorm - 0.55) / 0.45;
-          crateLid.position.y = (crateSize * 0.9) / 2 + 0.1 + (1.0 - lidClose) * 1.5;
-          crateLid.rotation.x = (1.0 - lidClose) * 0.8;
+        // LED Indicator status
+        const ledMat = cartonObj.ledIndicator.material as THREE.MeshStandardMaterial;
+        if (state.cartonSealed) {
+          ledMat.emissiveIntensity = 1.2;
+          ledMat.color.setHex(0x10b981);
         } else {
-          crateLid.position.y = (crateSize * 0.9) / 2 + 1.6;
-          crateLid.rotation.x = 0.8;
+          ledMat.emissiveIntensity = 0.3;
+          ledMat.color.setHex(0x0284c7);
         }
+      }
 
-        truckGroup.visible = false;
-      } 
-      else {
-        // --- PHASE 5: Loading into Reefer Truck & Dispatch (0.92 -> 1.00) ---
-        // Sealed crate slides into truck, truck doors shut, truck drives off!
-        const dispatchNorm = (p - 0.92) / (1.00 - 0.92);
-        pearGroup.visible = false;
+      // Update Truck
+      truckObj.group.visible = state.truckVisible;
+      if (state.truckVisible) {
+        truckObj.group.position.set(
+          state.truckPosition[0],
+          state.truckPosition[1],
+          state.truckPosition[2]
+        );
+        truckObj.group.scale.set(
+          state.truckScale[0],
+          state.truckScale[1],
+          state.truckScale[2]
+        );
 
-        crateGroup.visible = dispatchNorm < 0.45;
-        if (crateGroup.visible) {
-          crateGroup.scale.set(0.5, 0.5, 0.5);
-          crateGroup.position.set(-1.0 + dispatchNorm * 2.0, -0.2, -1.0 - dispatchNorm * 3.0);
-        }
-
-        truckGroup.visible = true;
-        truckGroup.scale.set(0.85, 0.85, 0.85);
-
-        // Truck arrives, seals, then accelerates forward along highway
-        if (dispatchNorm < 0.3) {
-          // Truck arriving into frame
-          const arrive = dispatchNorm / 0.3;
-          truckGroup.position.set(8.0 - arrive * 8.0, -0.6, -1.5);
-          truckGroup.rotation.y = Math.PI * 0.05;
-        } else {
-          // Truck speeding away into distance
-          const speed = (dispatchNorm - 0.3) / 0.7;
-          const dist = Math.pow(speed, 2.2) * 28.0;
-          truckGroup.position.set(-dist, -0.6, -1.5 - dist * 0.8);
-          truckGroup.rotation.y = 0;
-        }
+        // Rotate all 6 wheels with travel distance
+        truckObj.wheels.forEach((wheel) => {
+          wheel.rotation.z = state.wheelRotation;
+        });
       }
 
       renderer.render(scene, camera);
@@ -578,226 +1045,46 @@ export const PearScrollytelling: React.FC<PearScrollytellingProps> = ({
 
     animate();
 
-    // 9. Resize Listener
+    // 8. Viewport Resize Handler
     const handleResize = () => {
-      if (!containerRef.current || !rendererRef.current) return;
-      const w = containerRef.current.clientWidth;
-      const h = containerRef.current.clientHeight;
-      camera.aspect = w / h;
+      width = window.innerWidth;
+      height = window.innerHeight;
+      camera.aspect = width / height;
       camera.updateProjectionMatrix();
-      rendererRef.current.setSize(w, h);
+      renderer.setSize(width, height);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
     };
-    window.addEventListener('resize', handleResize);
+    window.addEventListener('resize', handleResize, { passive: true });
 
+    // 9. Comprehensive WebGL Lifecycle Disposal & Teardown
     return () => {
       cancelAnimationFrame(animationFrameId);
       window.removeEventListener('resize', handleResize);
-      pearGeometry.dispose();
-      pearShaderMaterial.dispose();
+
+      // Cleanly dispose all geometries
+      allGeometries.forEach((geo) => geo.dispose());
+
+      // Cleanly dispose all materials
+      allMaterials.forEach((mat) => mat.dispose());
+
+      // Force WebGL context release
       renderer.dispose();
+      renderer.forceContextLoss();
+
+      if (container.contains(renderer.domElement)) {
+        container.removeChild(renderer.domElement);
+      }
     };
   }, []);
 
-  // Update progress directly via interactive scrubber
-  const handleScrub = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = parseFloat(e.target.value);
-    isUserScrubbing.current = true;
-    progressRef.current = val;
-    setInteractiveProgress(val);
-    if (onProgressChange) {
-      onProgressChange(val);
-    }
-  };
-
-  const handleScrubEnd = () => {
-    isUserScrubbing.current = false;
-  };
-
-  // Stage details for HUD overlay
-  const getStageInfo = (p: number) => {
-    if (p < 0.22) {
-      return {
-        stage: '01 / HARVEST',
-        title: 'Fresh Agricultural Asset',
-        bhi: '99.8%',
-        temp: '+0.8°C [OPTIMAL]',
-        ethanol: '2.4 ppm',
-        status: 'Pristine Asian Pear (Pyrus pyrifolia) • Baseline Shelf-Life: 30 Days',
-        color: 'text-emerald-400',
-        borderColor: 'border-emerald-500/40',
-        badge: 'ACTIVE PRESERVATION',
-      };
-    } else if (p < 0.65) {
-      const decayPct = ((p - 0.22) / (0.65 - 0.22) * 100).toFixed(0);
-      return {
-        stage: '02 / TEMPERATURE EXCURSION',
-        title: 'Biological Rot & Decay Active',
-        bhi: `${Math.max(12, 100 - parseInt(decayPct))}%`,
-        temp: `+${(2.0 + parseInt(decayPct) * 0.25).toFixed(1)}°C [CRITICAL HEAT]`,
-        ethanol: `${(4.0 + parseInt(decayPct) * 0.45).toFixed(1)} ppm`,
-        status: `Reefer Failure • Pectin Hydrolysis • Microbial Spoilage (${decayPct}% decayed)`,
-        color: 'text-rose-400',
-        borderColor: 'border-rose-500/50',
-        badge: 'CRITICAL SPOILAGE RISK',
-      };
-    } else if (p < 0.82) {
-      return {
-        stage: '03 / AI TWIN INTERVENTION',
-        title: 'Quantum Bio-Twin Time Reversal',
-        bhi: '98.5% [RECOVERED]',
-        temp: '+1.2°C [STABILIZED]',
-        ethanol: '3.1 ppm',
-        status: 'Arrhenius Kinetics Halted Decay • Respiration Quenched • 100% Quality Restored',
-        color: 'text-cyan-400',
-        borderColor: 'border-cyan-500/40',
-        badge: 'BIO-TWIN PROTECTED',
-      };
-    } else if (p < 0.92) {
-      return {
-        stage: '04 / SMART ENCAPSULATION',
-        title: 'Sealing in FreshStream Crate',
-        bhi: '100.0%',
-        temp: '+0.5°C [PULSE-COOLED]',
-        ethanol: '2.2 ppm',
-        status: 'Airtight Insulated Reefer Crate • CA Nitrogen Atmosphere • Sealed Lock',
-        color: 'text-emerald-400',
-        borderColor: 'border-emerald-500/40',
-        badge: 'CONTAINER SEALED',
-      };
-    } else {
-      return {
-        stage: '05 / AUTONOMOUS DISPATCH',
-        title: 'Reefer Truck En Route',
-        bhi: '100.0%',
-        temp: '+1.0°C [DCSA MONITORED]',
-        ethanol: '2.0 ppm',
-        status: 'Dispatched via Trans-Caspian Corridor • Next Hub: Port Kuryk (Day 1 / 18)',
-        color: 'text-indigo-400',
-        borderColor: 'border-indigo-500/40',
-        badge: 'IN TRANSIT',
-      };
-    }
-  };
-
-  const stage = getStageInfo(interactiveProgress);
-
   return (
-    <div className="relative w-full h-[650px] sm:h-[750px] md:h-[850px] overflow-hidden rounded-3xl border border-slate-800 bg-gradient-to-b from-slate-950/80 via-slate-900/60 to-slate-950/90 shadow-2xl">
-      {/* 3D WebGL Canvas Container */}
-      <div ref={containerRef} className="absolute inset-0 w-full h-full cursor-grab active:cursor-grabbing" />
-
-      {/* Top HUD: Real-time Biological Twin Telemetry Overlay */}
-      <div className="absolute top-4 sm:top-6 left-4 sm:left-6 right-4 sm:right-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 pointer-events-none z-10">
-        <div className={`p-3.5 sm:p-4 rounded-2xl bg-slate-950/85 backdrop-blur-md border ${stage.borderColor} shadow-xl max-w-md`}>
-          <div className="flex items-center gap-2 mb-1.5">
-            <span className="font-mono text-[10px] tracking-widest text-slate-400 font-bold uppercase">
-              {stage.stage}
-            </span>
-            <span className="text-slate-600">•</span>
-            <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-slate-900/80 ${stage.color}`}>
-              {stage.badge}
-            </span>
-          </div>
-          <h3 className="text-base sm:text-lg font-bold text-white tracking-tight">
-            {stage.title}
-          </h3>
-          <p className="text-xs text-slate-300 mt-1 leading-relaxed">
-            {stage.status}
-          </p>
-        </div>
-
-        {/* Live Gauges */}
-        <div className="flex items-center gap-2.5 sm:gap-3 p-2.5 sm:p-3 rounded-2xl bg-slate-950/85 backdrop-blur-md border border-slate-800 shadow-xl">
-          <div className="flex flex-col text-right">
-            <span className="text-[10px] font-mono text-slate-400">HEALTH INDEX</span>
-            <span className={`text-base sm:text-lg font-mono font-extrabold ${stage.color}`}>
-              {stage.bhi}
-            </span>
-          </div>
-          <div className="w-px h-8 bg-slate-800" />
-          <div className="flex flex-col text-right">
-            <span className="text-[10px] font-mono text-slate-400">CORE TEMP</span>
-            <span className="text-xs sm:text-sm font-mono font-bold text-cyan-300">
-              {stage.temp}
-            </span>
-          </div>
-          <div className="w-px h-8 bg-slate-800" />
-          <div className="flex flex-col text-right">
-            <span className="text-[10px] font-mono text-slate-400">VOC ETHANOL</span>
-            <span className="text-xs sm:text-sm font-mono font-bold text-amber-300">
-              {stage.ethanol}
-            </span>
-          </div>
-        </div>
-      </div>
-
-      {/* Bottom Interactive Scroller & Story Controller */}
-      <div className="absolute bottom-4 sm:bottom-6 left-4 sm:left-6 right-4 sm:right-6 z-20 pointer-events-auto">
-        <div className="p-4 sm:p-5 rounded-2xl bg-slate-950/90 backdrop-blur-xl border border-slate-800 shadow-2xl flex flex-col gap-3">
-          <div className="flex items-center justify-between text-xs text-slate-300">
-            <span className="flex items-center gap-2 font-medium">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-              Scroll down or drag timeline to scrub decay & truck dispatch:
-            </span>
-            <span className="font-mono text-slate-400 font-bold">
-              {(interactiveProgress * 100).toFixed(0)}%
-            </span>
-          </div>
-
-          {/* Timeline Range Scrubber */}
-          <input
-            type="range"
-            min="0"
-            max="1"
-            step="0.002"
-            value={interactiveProgress}
-            onChange={handleScrub}
-            onMouseUp={handleScrubEnd}
-            onTouchEnd={handleScrubEnd}
-            aria-label="3D Decay Scrollytelling Progress"
-            className="w-full h-2.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-emerald-400 hover:accent-emerald-300 transition-all"
-          />
-
-          {/* Story Chapter Markers */}
-          <div className="grid grid-cols-5 text-[10px] font-mono text-slate-400 pt-1 border-t border-slate-800/80">
-            <button 
-              type="button"
-              onClick={() => { progressRef.current = 0.05; setInteractiveProgress(0.05); }}
-              className={`text-left hover:text-emerald-400 transition-colors ${interactiveProgress < 0.22 ? 'text-emerald-400 font-bold' : ''}`}
-            >
-              1. Fresh Pear
-            </button>
-            <button 
-              type="button"
-              onClick={() => { progressRef.current = 0.45; setInteractiveProgress(0.45); }}
-              className={`text-center hover:text-rose-400 transition-colors ${interactiveProgress >= 0.22 && interactiveProgress < 0.65 ? 'text-rose-400 font-bold' : ''}`}
-            >
-              2. Biological Rot
-            </button>
-            <button 
-              type="button"
-              onClick={() => { progressRef.current = 0.72; setInteractiveProgress(0.72); }}
-              className={`text-center hover:text-cyan-400 transition-colors ${interactiveProgress >= 0.65 && interactiveProgress < 0.82 ? 'text-cyan-400 font-bold' : ''}`}
-            >
-              3. AI Reversal
-            </button>
-            <button 
-              type="button"
-              onClick={() => { progressRef.current = 0.86; setInteractiveProgress(0.86); }}
-              className={`text-center hover:text-emerald-400 transition-colors ${interactiveProgress >= 0.82 && interactiveProgress < 0.92 ? 'text-emerald-400 font-bold' : ''}`}
-            >
-              4. Smart Crate
-            </button>
-            <button 
-              type="button"
-              onClick={() => { progressRef.current = 0.98; setInteractiveProgress(0.98); }}
-              className={`text-right hover:text-indigo-400 transition-colors ${interactiveProgress >= 0.92 ? 'text-indigo-400 font-bold' : ''}`}
-            >
-              5. Truck Departs
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
+    <div
+      ref={containerRef}
+      className="fixed inset-0 -z-10 w-screen h-screen overflow-hidden pointer-events-none"
+      style={{ width: '100vw', height: '100vh' }}
+      aria-hidden="true"
+    />
   );
 };
+
+export default PearScrollytelling;

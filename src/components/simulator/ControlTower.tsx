@@ -47,51 +47,127 @@ export const ControlTower: React.FC<ControlTowerProps> = ({ shipmentId, initialT
   // 2. Synchronous Instant Arrhenius Kinetics Engine (PIML)
   const kinetics = useMemo(() => calculateKinetics(telemetry), [telemetry]);
 
-  // 3. Connect to Real-Time SSE Telemetry Stream
+  // 3. Connect to Real-Time SSE Telemetry Stream with strict cleanup & visibility pause
   useEffect(() => {
     if (!isStreaming || typeof window === 'undefined') {
       setStreamConnected(false);
       return;
     }
 
-    const targetShipment = (shipmentId || 'FS-8821').toUpperCase();
-    const eventSource = new EventSource(`/api/telemetry/stream?shipmentId=${targetShipment}`);
+    let es: EventSource | null = null;
+    let errorCount = 0;
+    const maxErrors = 3;
+    let reconnectTimeout: NodeJS.Timeout | null = null;
+    let isDisposed = false;
 
-    eventSource.addEventListener('connected', () => {
-      setStreamConnected(true);
-    });
+    const connect = () => {
+      if (isDisposed || (typeof document !== 'undefined' && document.visibilityState === 'hidden')) return;
 
-    eventSource.addEventListener('telemetry', (event) => {
-      try {
-        const payload = JSON.parse(event.data);
-        if (payload && payload.telemetry) {
-          setStreamConnected(true);
-          setLastStreamTime(new Date().toLocaleTimeString());
+      const targetShipment = (shipmentId || 'FS-8821').toUpperCase();
+      es = new EventSource(`/api/telemetry/stream?shipmentId=${targetShipment}`);
 
-          setTelemetry((prev) => ({
-            ...prev,
-            temperature: typeof payload.telemetry.temperature === 'number' ? payload.telemetry.temperature : prev.temperature,
-            humidity: typeof payload.telemetry.humidity === 'number' ? payload.telemetry.humidity : prev.humidity,
-            ethanol: typeof payload.telemetry.ethanol === 'number' ? payload.telemetry.ethanol : prev.ethanol,
-            vibration: typeof payload.telemetry.vibration === 'number' ? payload.telemetry.vibration : prev.vibration,
-            waypoint: (payload.telemetry.location as RouteWaypoint) || prev.waypoint,
-          }));
+      es.addEventListener('connected', () => {
+        setStreamConnected(true);
+        errorCount = 0;
+      });
 
-          if (payload.prediction?.rul_hours != null) {
-            setMlRulHours(payload.prediction.rul_hours);
+      es.addEventListener('telemetry', (event) => {
+        try {
+          const payload = JSON.parse(event.data);
+          if (payload && payload.telemetry) {
+            setStreamConnected(true);
+            setLastStreamTime(new Date().toLocaleTimeString());
+
+            setTelemetry((prev) => ({
+              ...prev,
+              temperature: typeof payload.telemetry.temperature === 'number' ? payload.telemetry.temperature : prev.temperature,
+              humidity: typeof payload.telemetry.humidity === 'number' ? payload.telemetry.humidity : prev.humidity,
+              ethanol: typeof payload.telemetry.ethanol === 'number' ? payload.telemetry.ethanol : prev.ethanol,
+              vibration: typeof payload.telemetry.vibration === 'number' ? payload.telemetry.vibration : prev.vibration,
+              waypoint: (payload.telemetry.location as RouteWaypoint) || prev.waypoint,
+            }));
+
+            if (payload.prediction?.rul_hours != null) {
+              setMlRulHours(payload.prediction.rul_hours);
+            }
           }
+        } catch (err) {
+          console.warn('Error parsing incoming SSE telemetry payload:', err);
         }
-      } catch (err) {
-        console.warn('Error parsing incoming SSE telemetry payload:', err);
-      }
-    });
+      });
 
-    eventSource.onerror = () => {
-      setStreamConnected(false);
+      es.addEventListener('reconnect', () => {
+        // Server cleanly recycling connection after max duration
+        if (es) {
+          es.close();
+          es = null;
+        }
+        if (!isDisposed) {
+          reconnectTimeout = setTimeout(connect, 1000);
+        }
+      });
+
+      es.onerror = () => {
+        setStreamConnected(false);
+        if (es) {
+          es.close();
+          es = null;
+        }
+        errorCount++;
+        if (errorCount < maxErrors && !isDisposed) {
+          const backoff = Math.min(1000 * Math.pow(2, errorCount), 8000);
+          reconnectTimeout = setTimeout(connect, backoff);
+        }
+      };
     };
 
+    connect();
+
+    // Pause stream when tab is hidden, resume when visible
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') {
+        if (reconnectTimeout) {
+          clearTimeout(reconnectTimeout);
+          reconnectTimeout = null;
+        }
+        if (es) {
+          es.close();
+          es = null;
+        }
+        setStreamConnected(false);
+      } else if (document.visibilityState === 'visible' && !isDisposed && isStreaming) {
+        errorCount = 0;
+        connect();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    const handleBeforeUnload = () => {
+      isDisposed = true;
+      if (reconnectTimeout) {
+        clearTimeout(reconnectTimeout);
+        reconnectTimeout = null;
+      }
+      if (es) {
+        es.close();
+        es = null;
+      }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
     return () => {
-      eventSource.close();
+      isDisposed = true;
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      if (reconnectTimeout) {
+        clearTimeout(reconnectTimeout);
+        reconnectTimeout = null;
+      }
+      if (es) {
+        es.close();
+        es = null;
+      }
       setStreamConnected(false);
     };
   }, [isStreaming, shipmentId]);

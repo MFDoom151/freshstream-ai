@@ -26,20 +26,20 @@ export const GlassCard: React.FC<GlassCardProps> = ({
   ...props
 }) => {
   const variantStyles: Record<GlassCardVariant, string> = {
-    default: 'border-slate-800 hover:border-slate-700',
-    'glow-mint': 'border-emerald-500/40 hover:border-emerald-500/70',
-    'glow-purple': 'border-indigo-500/40 hover:border-indigo-500/70',
-    danger: 'border-red-500/50 bg-red-950/20',
-    interactive: 'border-slate-800 hover:border-slate-600 hover:bg-slate-900/95 cursor-pointer',
+    default: 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700',
+    'glow-mint': 'border-emerald-600/30 dark:border-emerald-500/20 hover:border-emerald-500/40',
+    'glow-purple': 'border-slate-300 dark:border-slate-700 hover:border-slate-400 dark:hover:border-slate-600',
+    danger: 'border-red-500/40 bg-red-50/50 dark:bg-red-950/20',
+    interactive: 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-900/95 cursor-pointer',
   };
 
   const hoverClasses = hoverEffect 
-    ? 'hover:-translate-y-0.5 hover:shadow-lg transition-all duration-200' 
+    ? 'hover:-translate-y-0.5 hover:shadow-md transition-all duration-200' 
     : 'transition-all duration-150';
 
   return (
     <div
-      className={`relative rounded-xl backdrop-blur-md bg-slate-900/85 dark:bg-slate-900/85 light:bg-white/95 border text-slate-100 dark:text-slate-100 light:text-slate-900 shadow-sm ${variantStyles[variant]} ${hoverClasses} ${className}`}
+      className={`relative rounded-xl backdrop-blur-md bg-white/90 dark:bg-slate-900/85 border text-slate-900 dark:text-slate-100 shadow-sm ${variantStyles[variant]} ${hoverClasses} ${className}`}
       {...props}
     >
       {children}

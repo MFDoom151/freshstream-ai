@@ -377,6 +377,7 @@ export interface TranslationDictionary {
     tab_pilot: string;
     tab_investor: string;
     tab_academic: string;
+    tab_enterprise: string;
     fn_name: string;
     fn_email: string;
     fn_company: string;
@@ -391,6 +392,7 @@ export interface TranslationDictionary {
     opt_cat_pilot: string;
     opt_cat_investor: string;
     opt_cat_academic: string;
+    opt_cat_enterprise: string;
     opt_cat_media: string;
     opt_fleet_1: string;
     opt_fleet_2: string;

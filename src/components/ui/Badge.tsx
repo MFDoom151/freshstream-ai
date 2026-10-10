@@ -27,12 +27,12 @@ export const Badge: React.FC<BadgeProps> = ({
   };
 
   const variantStyles: Record<BadgeVariant, string> = {
-    mint: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30 shadow-[0_0_10px_rgba(16,185,129,0.15)]',
-    purple: 'bg-purple-500/10 text-purple-400 border-purple-500/30 shadow-[0_0_10px_rgba(139,92,246,0.15)]',
-    amber: 'bg-amber-500/10 text-amber-400 border-amber-500/30',
-    warning: 'bg-amber-500/10 text-amber-400 border-amber-500/30',
-    danger: 'bg-red-500/15 text-red-400 border-red-500/30 animate-pulse',
-    slate: 'bg-slate-800/80 text-slate-300 border-slate-700/60',
+    mint: 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border-emerald-500/30',
+    purple: 'bg-indigo-500/10 text-indigo-700 dark:text-indigo-400 border-indigo-500/30',
+    amber: 'bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/30',
+    warning: 'bg-amber-500/10 text-amber-700 dark:text-amber-400 border-amber-500/30',
+    danger: 'bg-red-500/15 text-red-700 dark:text-red-400 border-red-500/30 animate-pulse',
+    slate: 'bg-slate-100 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700/60',
   };
 
   const dotColor: Record<BadgeVariant, string> = {
