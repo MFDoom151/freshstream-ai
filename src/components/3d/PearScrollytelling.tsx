@@ -774,15 +774,15 @@ export function computeScrollytellingState(pRaw: number, isDesktop: boolean = tr
     if (norm < 0.30) {
       // Truck pulling in from right into framing position
       const arriveT = norm / 0.30;
-      truckX = THREE.MathUtils.lerp(xOffset + 4.0, xOffset + 0.3, arriveT);
+      truckX = THREE.MathUtils.lerp(xOffset + 4.0, xOffset, arriveT);
       wheelRot = (xOffset + 4.0 - truckX) * 2.2;
     } else {
       // Truck accelerates along highway corridor into perspective distance, remaining clearly visible in frame
       const driveT = (norm - 0.30) / 0.70;
       const dist = driveT * 1.5;
-      truckX = (xOffset + 0.3) - dist * 0.4;
+      truckX = xOffset - dist * 0.8;
       truckZ = -1.2 - dist * 1.0;
-      wheelRot = 9.0 + dist * 3.5;
+      wheelRot = 8.8 + dist * 3.5;
     }
 
     return {
