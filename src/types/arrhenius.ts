@@ -1,5 +1,22 @@
-export type CargoType = 'berries' | 'beef' | 'dairy' | 'fruits';
-export type RouteWaypoint = 'kuryk' | 'baku' | 'poti' | 'istanbul';
+export type CargoType = 'pears' | 'beef' | 'berries' | 'dairy' | 'fruits';
+
+export type TransportMode = 
+  | 'RAIL_REEFER' 
+  | 'RO_PAX_FERRY' 
+  | 'TIR_TRUCK' 
+  | 'SMART_REEFER_CONTAINER';
+
+export type RouteWaypoint = 
+  | 'khorgos' 
+  | 'almaty' 
+  | 'shymkent' 
+  | 'beyneu' 
+  | 'kuryk' 
+  | 'baku' 
+  | 'tbilisi' 
+  | 'poti' 
+  | 'istanbul';
+
 export type AlertSeverity = 'OPTIMAL' | 'NOMINAL' | 'WARNING' | 'CRITICAL' | 'CONDEMNED';
 
 export interface TelemetryInput {
@@ -8,8 +25,14 @@ export interface TelemetryInput {
   ethanol: number;     // 0 to 100 ppm
   humidity: number;    // 20 to 100 %
   vibration: number;   // 0.1 to 3.0 G
+  transport_mode?: TransportMode;
+  co2_pct?: number;    // 0 to 15 %
+  o2_pct?: number;     // 1 to 21 %
+  ethylene_ppm?: number; // 0 to 50 ppm
   cargo_value_usd?: number; // default $68,000
   waypoint?: RouteWaypoint; // default 'kuryk'
+  container_id?: string;
+  api_standard?: 'DCSA' | 'KTZ_EDI' | 'AIS_MARITIME';
 }
 
 export interface KineticsOutput {

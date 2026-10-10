@@ -1,24 +1,47 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   ArrowRight, 
   Radio, 
   Cpu, 
-  Zap
+  Zap,
+  Sparkles,
+  ShieldCheck,
+  Truck,
+  Box,
+  Layers,
+  Activity
 } from 'lucide-react';
 import { Container } from '@/components/ui/Container';
 import { GlassCard } from '@/components/ui/GlassCard';
 import { Button } from '@/components/ui/Button';
 import { Badge } from '@/components/ui/Badge';
 import { useI18n } from '@/lib/i18n/context';
+import { PearScrollytellingDynamic } from '@/components/3d/PearScrollytellingDynamic';
 
 export default function HomePage() {
   const { t } = useI18n();
+  const [scrollProgress, setScrollProgress] = useState<number>(0);
+
+  // Track window scroll progress for scrollytelling
+  useEffect(() => {
+    const handleScroll = () => {
+      const totalScroll = document.documentElement.scrollHeight - window.innerHeight;
+      if (totalScroll > 0) {
+        const current = Math.min(1.0, Math.max(0.0, window.scrollY / totalScroll));
+        setScrollProgress(current);
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   return (
-    <div className="flex flex-col gap-20 py-12 md:py-20">
-      {/* Hero Section */}
+    <div className="flex flex-col gap-16 md:gap-24 py-8 md:py-16">
+      {/* 1. Hero Introduction */}
       <section className="relative">
         <Container size="lg">
           <div className="flex flex-col items-center text-center max-w-4xl mx-auto gap-6">
@@ -37,8 +60,8 @@ export default function HomePage() {
               {t('hero.subhead')}
             </p>
 
-            {/* CTAs */}
-            <div className="flex flex-wrap items-center justify-center gap-4 pt-4">
+            {/* Quick Action CTAs */}
+            <div className="flex flex-wrap items-center justify-center gap-4 pt-2">
               <Button
                 href="/dashboard"
                 variant="primary"
@@ -48,11 +71,12 @@ export default function HomePage() {
                 {t('nav.launch_dashboard') || 'Launch Fleet Dashboard'}
               </Button>
               <Button
-                href="/dashboard/support"
+                href="/dashboard/shipment/FS-8821"
                 variant="glass"
                 size="lg"
+                rightIcon={<Activity className="w-5 h-5" />}
               >
-                {t('hero.cta_invest')}
+                {t('hero.cta_demo') || 'Digital Twin Control Tower'}
               </Button>
               <Button
                 href="/dashboard/analytics"
@@ -62,50 +86,91 @@ export default function HomePage() {
                 {t('nav.analytics')}
               </Button>
             </div>
-
-            {/* Hero Metrics Badges (3 Glass Cards) */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full pt-12">
-              <GlassCard variant="glow-mint" className="p-6 text-left">
-                <div className="text-3xl sm:text-4xl font-black text-emerald-400 mb-1">
-                  {t('hero.metric_1_val')}
-                </div>
-                <div className="text-sm font-bold text-white uppercase tracking-wider mb-2">
-                  {t('hero.metric_1_lbl')}
-                </div>
-                <div className="text-xs text-slate-400">
-                  {t('hero.metric_1_sub')}
-                </div>
-              </GlassCard>
-
-              <GlassCard variant="glow-purple" className="p-6 text-left">
-                <div className="text-3xl sm:text-4xl font-black text-purple-400 mb-1">
-                  {t('hero.metric_2_val')}
-                </div>
-                <div className="text-sm font-bold text-white uppercase tracking-wider mb-2">
-                  {t('hero.metric_2_lbl')}
-                </div>
-                <div className="text-xs text-slate-400">
-                  {t('hero.metric_2_sub')}
-                </div>
-              </GlassCard>
-
-              <GlassCard variant="glow-mint" className="p-6 text-left">
-                <div className="text-3xl sm:text-4xl font-black text-cyan-400 mb-1">
-                  {t('hero.metric_3_val')}
-                </div>
-                <div className="text-sm font-bold text-white uppercase tracking-wider mb-2">
-                  {t('hero.metric_3_lbl')}
-                </div>
-                <div className="text-xs text-slate-400">
-                  {t('hero.metric_3_sub')}
-                </div>
-              </GlassCard>
-            </div>
           </div>
         </Container>
       </section>
 
-      {/* Value Proposition Grid (3 Core Pillars) */}
+      {/* 2. Interactive 3D Biological Twin Scrollytelling Showcase */}
+      <section className="relative">
+        <Container size="lg">
+          <div className="flex flex-col gap-6">
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+              <div>
+                <div className="flex items-center gap-2 mb-2">
+                  <Badge variant="mint" size="sm" dot>
+                    REAL-TIME 3D BIOLOGICAL DIGITAL TWIN
+                  </Badge>
+                  <span className="text-xs font-mono text-slate-400">
+                    Arrhenius Degradation & AI Time-Reversal Engine
+                  </span>
+                </div>
+                <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-white tracking-tight">
+                  From Orchard Harvest to Cold-Chain Dispatch
+                </h2>
+                <p className="text-sm sm:text-base text-slate-300 max-w-2xl mt-1 leading-relaxed">
+                  Scroll down through the page or drag the timeline scrubber below to observe the perishable asset undergo thermal abuse, decay, AI time-reversal, smart crate encapsulation, and autonomous reefer truck dispatch.
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2 text-xs font-mono text-slate-400 bg-slate-900/80 px-3.5 py-2 rounded-xl border border-slate-800">
+                <Sparkles className="w-4 h-4 text-emerald-400" />
+                <span>Hardware Accelerated WebGL • 60 FPS</span>
+              </div>
+            </div>
+
+            {/* 3D WebGL Canvas Component */}
+            <PearScrollytellingDynamic 
+              scrollProgress={scrollProgress} 
+              onProgressChange={(p) => setScrollProgress(p)}
+            />
+          </div>
+        </Container>
+      </section>
+
+      {/* 3. Hero Metrics Badges */}
+      <section>
+        <Container size="lg">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
+            <GlassCard variant="glow-mint" className="p-6 text-left">
+              <div className="text-3xl sm:text-4xl font-black text-emerald-400 mb-1">
+                {t('hero.metric_1_val')}
+              </div>
+              <div className="text-sm font-bold text-white uppercase tracking-wider mb-2">
+                {t('hero.metric_1_lbl')}
+              </div>
+              <div className="text-xs text-slate-400">
+                {t('hero.metric_1_sub')}
+              </div>
+            </GlassCard>
+
+            <GlassCard variant="glow-purple" className="p-6 text-left">
+              <div className="text-3xl sm:text-4xl font-black text-purple-400 mb-1">
+                {t('hero.metric_2_val')}
+              </div>
+              <div className="text-sm font-bold text-white uppercase tracking-wider mb-2">
+                {t('hero.metric_2_lbl')}
+              </div>
+              <div className="text-xs text-slate-400">
+                {t('hero.metric_2_sub')}
+              </div>
+            </GlassCard>
+
+            <GlassCard variant="glow-mint" className="p-6 text-left">
+              <div className="text-3xl sm:text-4xl font-black text-cyan-400 mb-1">
+                {t('hero.metric_3_val')}
+              </div>
+              <div className="text-sm font-bold text-white uppercase tracking-wider mb-2">
+                {t('hero.metric_3_lbl')}
+              </div>
+              <div className="text-xs text-slate-400">
+                {t('hero.metric_3_sub')}
+              </div>
+            </GlassCard>
+          </div>
+        </Container>
+      </section>
+
+      {/* 4. Core Technology Pillars */}
       <section>
         <Container size="lg">
           <div className="flex flex-col items-center text-center gap-4 mb-12">
@@ -160,7 +225,7 @@ export default function HomePage() {
         </Container>
       </section>
 
-      {/* Digital Twin Interactive Teaser Section */}
+      {/* 5. Digital Twin Interactive Teaser Section */}
       <section>
         <Container size="lg">
           <GlassCard variant="glow-mint" className="p-8 md:p-12 relative overflow-hidden">
@@ -198,7 +263,7 @@ export default function HomePage() {
               <div className="rounded-xl border border-slate-700/80 bg-slate-950/80 p-6 flex flex-col gap-4 font-mono text-xs shadow-inner">
                 <div className="flex items-center justify-between border-b border-slate-800 pb-3">
                   <span className="text-emerald-400 font-bold">CONTAINER: KZ-REEF-8942</span>
-                  <span className="text-slate-400">WAYPOINT: Port Kuryk</span>
+                  <span className="text-slate-400">WAYPOINT: Port Kuryk (Day 6 / 18)</span>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="p-3 rounded-lg bg-slate-900/60 border border-slate-800">
@@ -219,7 +284,7 @@ export default function HomePage() {
                   </div>
                 </div>
                 <div className="pt-2 flex items-center justify-between text-[11px] text-slate-500 border-t border-slate-800/80">
-                  <span>Mesh Link: 868 MHz LoRaWAN</span>
+                  <span>DCSA Track & Trace 3.0 Connected</span>
                   <span className="text-emerald-400 font-sans font-semibold">● Protocol Active</span>
                 </div>
               </div>

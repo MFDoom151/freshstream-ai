@@ -96,10 +96,10 @@ export const Header: React.FC = () => {
               </div>
             </Link>
 
-            {/* Academic & Competition Partnership Badge (Hidden on mobile) */}
-            <div className="hidden xl:flex items-center gap-1.5 ml-3 pl-3 border-l border-slate-800 text-[11px] text-slate-400 font-mono">
+            {/* Enterprise Status Badge (Hidden on mobile) */}
+            <div className="hidden xl:flex items-center gap-1.5 ml-3 pl-3 border-l border-slate-800 text-[11px] text-emerald-400 font-mono">
               <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-              <span>GWU NVC × Satbayev Univ</span>
+              <span>ENTERPRISE DIGITAL TWIN</span>
             </div>
           </div>
 

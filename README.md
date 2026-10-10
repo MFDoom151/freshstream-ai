@@ -155,8 +155,8 @@ npm run build
 
 ---
 
-## 8. License & Institutional Credits
+## 8. License & Enterprise Platform
 
-Developed by **FreshStream AI** in collaboration with **Satbayev University** (School of Transport Engineering and Logistics) & **George Washington University New Venture Competition (GWU NVC 2026)**.
+Developed and maintained by **FreshStream AI** — Intelligent Agri-Asset Preservation Platform.
 
 License: **MIT License**.

@@ -15,11 +15,11 @@ export const viewport: Viewport = {
 
 export const metadata: Metadata = {
   title: 'FreshStream AI — Intelligent Agri-Asset Preservation',
-  description: 'Physics-Informed Biological Digital Twins and real-time volatile ethanol decay sensing along the Trans-Caspian Middle Corridor. GWU New Venture Competition 2026 in partnership with Satbayev University.',
+  description: 'Physics-Informed Biological Digital Twins and real-time volatile ethanol decay sensing along the Trans-Caspian Middle Corridor.',
   keywords: [
     'AgriTech', 'Cold-Chain', 'Biological Digital Twin', 'Arrhenius Kinetics', 
     'Trans-Caspian Middle Corridor', 'TITR', 'Food Spoilage Prevention', 
-    'GWU NVC', 'Satbayev University', 'IoT Telematics'
+    'Autonomous Logistics', 'IoT Telematics'
   ],
   authors: [{ name: 'FreshStream AI Engineering Team' }],
   icons: {

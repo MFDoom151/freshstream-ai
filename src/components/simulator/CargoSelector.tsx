@@ -14,10 +14,11 @@ interface CargoSelectorProps {
 }
 
 const CARGO_ICONS: Record<CargoType, React.ElementType> = {
+  pears: Apple,
+  fruits: Apple,
   beef: Beef,
   berries: Sparkles,
   dairy: Milk,
-  fruits: Apple,
 };
 
 export const CargoSelector: React.FC<CargoSelectorProps> = ({
@@ -26,7 +27,7 @@ export const CargoSelector: React.FC<CargoSelectorProps> = ({
   disabled = false,
 }) => {
   const { t } = useI18n();
-  const cargos: CargoType[] = ['beef', 'berries', 'dairy', 'fruits'];
+  const cargos: CargoType[] = ['pears', 'fruits', 'beef', 'berries', 'dairy'];
 
   return (
     <div className="flex flex-col gap-3">
@@ -39,7 +40,7 @@ export const CargoSelector: React.FC<CargoSelectorProps> = ({
         </span>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
         {cargos.map((type) => {
           const profile = COMMODITY_PROFILES[type];
           const isSelected = selectedCargo === type;

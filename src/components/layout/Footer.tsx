@@ -31,11 +31,11 @@ export const Footer: React.FC = () => {
             <div className="flex flex-col gap-2 pt-2">
               <div className="flex items-center gap-2 text-xs text-slate-300 font-medium">
                 <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
-                <span>{t('footer.affiliation_gwu')}</span>
+                <span>{t('footer.cert_iso')}</span>
               </div>
               <div className="flex items-center gap-2 text-xs text-slate-300 font-medium">
                 <ShieldCheck className="w-4 h-4 text-purple-400 shrink-0" />
-                <span>{t('footer.affiliation_satbayev')}</span>
+                <span>{t('footer.cert_iot')}</span>
               </div>
             </div>
           </div>
@@ -111,8 +111,8 @@ export const Footer: React.FC = () => {
               <div className="flex items-start gap-2">
                 <MapPin className="w-4 h-4 text-purple-400 shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-slate-300 font-medium">US Academic Liaison:</p>
-                  <p className="text-slate-400">George Washington University, Washington, DC 20052, USA</p>
+                  <p className="text-slate-300 font-medium">Global Operations:</p>
+                  <p className="text-slate-400">Trans-Caspian International Transport Corridor Hub</p>
                 </div>
               </div>
               <div className="flex items-center gap-2 pt-1">
@@ -131,7 +131,7 @@ export const Footer: React.FC = () => {
 
         {/* Bottom Bar: Copyright & Telemetry Status */}
         <div className="pt-8 border-t border-slate-800/80 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
-          <p>© 2026 {t('footer.rights')} {t('footer.affiliation_gwu')} & {t('footer.affiliation_satbayev')}.</p>
+          <p>© 2026 {t('footer.rights')}</p>
           <div className="flex items-center gap-3">
             <Badge variant="mint" size="sm" dot>
               Conductor Agent: Online

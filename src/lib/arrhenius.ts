@@ -107,6 +107,27 @@ export const COMMODITY_PROFILES: Record<CargoType, CommodityProfile> = {
     kappaVib: 0.35,
     defaultCargoValueUsd: 28000,
   },
+  pears: {
+    type: 'pears',
+    name: 'Asian & Mountain Pears (Pyrus pyrifolia)',
+    regionalOrigin: 'Almaty & Foothill Terraces',
+    spoilageMechanism: 'Pectin Hydrolysis, Core Browning & Ethylene Softening',
+    ea: 72000,
+    a: 2.1400e11,
+    lnA: 26.09,
+    tRef: 0.8,
+    tOptMin: -0.5,
+    tOptMax: 1.5,
+    tFreeze: -1.8,
+    baselineHours: 840,
+    baselineDays: 35,
+    kRef: 0.001190,
+    rhOptMin: 90,
+    rhOptMax: 95,
+    gammaEth: 1.6,
+    kappaVib: 0.28,
+    defaultCargoValueUsd: 74000,
+  },
 };
 
 const R = 8.314; // Universal gas constant in J/(mol·K)

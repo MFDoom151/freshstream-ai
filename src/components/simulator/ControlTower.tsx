@@ -14,6 +14,8 @@ import { Badge } from '@/components/ui/Badge';
 import { Activity, Radio, CheckCircle2, Wifi, WifiOff, Cpu } from 'lucide-react';
 import { useI18n } from '@/lib/i18n/context';
 
+import { LogisticsApiExplorerModal } from './LogisticsApiExplorerModal';
+
 export interface ControlTowerProps {
   shipmentId?: string;
   initialTelemetry?: Partial<TelemetryInput>;
@@ -21,6 +23,9 @@ export interface ControlTowerProps {
 
 export const ControlTower: React.FC<ControlTowerProps> = ({ shipmentId, initialTelemetry }) => {
   const { t } = useI18n();
+
+  // Modal State
+  const [isApiModalOpen, setIsApiModalOpen] = useState<boolean>(false);
 
   // 1. Client Simulation State
   const [telemetry, setTelemetry] = useState<TelemetryInput>({
@@ -159,6 +164,17 @@ export const ControlTower: React.FC<ControlTowerProps> = ({ shipmentId, initialT
             <span className="text-slate-300 dark:text-slate-300 light:text-slate-700">
               {t('demo.transit_segment')}
             </span>
+            <span className="text-slate-600 dark:text-slate-600 light:text-slate-300">|</span>
+
+            {/* Logistics APIs Modal Trigger Button */}
+            <button
+              onClick={() => setIsApiModalOpen(true)}
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-semibold transition-all cursor-pointer bg-blue-500/10 text-blue-400 hover:bg-blue-500/20 border border-blue-500/30 shadow-sm"
+              title="Open Rail & Reefer Container Logistics API Inspector"
+            >
+              <Cpu className="w-3.5 h-3.5 text-blue-400" />
+              <span>LOGISTICS APIS</span>
+            </button>
             <span className="text-slate-600 dark:text-slate-600 light:text-slate-300">|</span>
 
             {/* Real-Time Live Streaming Toggle & Indicator */}
@@ -368,6 +384,14 @@ export const ControlTower: React.FC<ControlTowerProps> = ({ shipmentId, initialT
           />
         </div>
       </div>
+
+      {/* Logistics API Explorer Modal */}
+      <LogisticsApiExplorerModal
+        isOpen={isApiModalOpen}
+        onClose={() => setIsApiModalOpen(false)}
+        telemetry={telemetry}
+        shipmentId={shipmentId || 'FS-8821'}
+      />
     </div>
   );
 };

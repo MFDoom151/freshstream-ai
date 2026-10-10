@@ -47,8 +47,8 @@ export interface TranslationDictionary {
   // Global Footer
   footer: {
     brand_desc: string;
-    affiliation_gwu: string;
-    affiliation_satbayev: string;
+    cert_iso: string;
+    cert_iot: string;
     links_title: string;
     technology_title: string;
     inquiries_title: string;
