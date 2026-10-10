@@ -175,7 +175,7 @@ export const RouteSelector: React.FC<RouteSelectorProps> = ({
               onClick={() => onSelectWaypoint(wp.id)}
               className={`p-2.5 rounded-xl border text-left transition-all duration-200 cursor-pointer relative flex flex-col justify-between min-h-[92px] ${
                 isSelected
-                  ? 'bg-purple-950/40 dark:bg-purple-950/40 light:bg-purple-50 border-purple-500 ring-1 ring-purple-500/50 shadow-[0_0_15px_rgba(139,92,246,0.2)]'
+                  ? 'bg-purple-950/40 dark:bg-purple-950/40 light:bg-purple-50 border-purple-500 ring-1 ring-purple-500/50 shadow-sm'
                   : 'bg-slate-950/60 dark:bg-slate-950/60 light:bg-white/80 border-slate-800/80 dark:border-slate-800/80 light:border-slate-200 hover:border-slate-700 hover:bg-slate-900/40'
               }`}
             >

@@ -54,7 +54,7 @@ export const CargoSelector: React.FC<CargoSelectorProps> = ({
               onClick={() => onSelectCargo(type)}
               className={`flex flex-col p-3.5 rounded-xl border text-left transition-all duration-200 cursor-pointer relative overflow-hidden focus:outline-none focus:ring-2 focus:ring-emerald-400 ${
                 isSelected
-                  ? 'bg-slate-900/90 dark:bg-slate-900/90 light:bg-emerald-50/80 border-emerald-500 shadow-[0_0_20px_rgba(16,185,129,0.22)] ring-1 ring-emerald-500/50'
+                  ? 'bg-slate-900/90 dark:bg-slate-900/90 light:bg-emerald-50/80 border-emerald-500 shadow-sm ring-1 ring-emerald-500/50'
                   : 'bg-slate-950/60 dark:bg-slate-950/60 light:bg-white/80 border-slate-800/80 dark:border-slate-800/80 light:border-slate-200 hover:border-slate-700 hover:bg-slate-900/50 light:hover:bg-slate-100/70'
               }`}
             >

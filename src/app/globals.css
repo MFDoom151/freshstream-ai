@@ -33,8 +33,7 @@
   box-sizing: border-box;
 }
 
-html,
-body {
+html {
   margin: 0;
   padding: 0;
   min-height: 100vh;
@@ -44,7 +43,17 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
-/* Serious Industrial Dark Canvas with Subtle Mission-Grid */
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  color: var(--text-main);
+  overflow-x: hidden;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+/* Serious Industrial Dark Canvas with Subtle Mission-Grid on Root Document */
+.dark html,
 .dark body {
   background-color: #0B0F17;
   background-image: 
@@ -53,6 +62,7 @@ body {
   background-size: 32px 32px, 100% 100%;
 }
 
+.light html,
 .light body {
   color: var(--text-main);
   background-color: #F8FAFC;
@@ -60,6 +70,18 @@ body {
     radial-gradient(rgba(0, 0, 0, 0.04) 1px, transparent 1px),
     linear-gradient(180deg, #FFFFFF 0%, #F1F5F9 100%);
   background-size: 32px 32px, 100% 100%;
+}
+
+/* Ensure body background is strictly transparent on homepage so fixed 3D canvas is physically visible */
+body:has(#homepage-root),
+body:has(#pear-scrollytelling-canvas),
+body:has([data-pear-canvas]),
+.dark body:has([data-pear-canvas]),
+.light body:has([data-pear-canvas]),
+.dark body:has(#homepage-root),
+.light body:has(#homepage-root) {
+  background-color: transparent !important;
+  background-image: none !important;
 }
 
 /* Universal Light Mode Typography & Surface Safety Net */
@@ -101,11 +123,6 @@ body {
   }
 
   .glass-card-hover:hover {
-    border-color: rgba(100, 116, 139, 0.6);
-    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
-  }
-
-  .glass-card-purple-hover:hover {
     border-color: rgba(100, 116, 139, 0.6);
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
   }

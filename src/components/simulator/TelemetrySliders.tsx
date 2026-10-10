@@ -161,7 +161,7 @@ export const TelemetrySliders: React.FC<TelemetrySlidersProps> = ({
       <div
         className={`flex flex-col gap-2 p-3.5 rounded-xl border transition-colors ${
           isEthanolCritical
-            ? 'bg-red-950/30 border-red-500/60 shadow-[0_0_20px_rgba(239,68,68,0.2)]'
+            ? 'bg-red-950/30 border-red-500/60 shadow-sm'
             : 'bg-slate-950/70 border-slate-800/80'
         }`}
       >

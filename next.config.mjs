@@ -30,11 +30,6 @@ const nextConfig = {
         permanent: false,
       },
       {
-        source: '/demo',
-        destination: '/dashboard/shipment/FS-8821',
-        permanent: false,
-      },
-      {
         source: '/contact',
         destination: '/dashboard/support',
         permanent: false,

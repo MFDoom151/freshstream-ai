@@ -33,7 +33,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="dark" suppressHydrationWarning>
+    <html lang="en" className="dark bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100" suppressHydrationWarning>
       <head>
         {/* Anti-FOUC theme restoration script */}
         <script
@@ -56,7 +56,7 @@ export default function RootLayout({
         />
       </head>
       <body
-        className="font-sans antialiased min-h-screen flex flex-col selection:bg-emerald-500 selection:text-slate-950 overflow-x-hidden transition-colors duration-300 bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100"
+        className="font-sans antialiased min-h-screen flex flex-col selection:bg-emerald-500 selection:text-slate-950 overflow-x-hidden transition-colors duration-300 bg-transparent text-slate-900 dark:text-slate-100"
       >
         <ThemeProvider>
           <I18nProvider>

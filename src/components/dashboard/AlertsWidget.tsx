@@ -87,7 +87,7 @@ export const AlertsWidget: React.FC<AlertsWidgetProps> = ({ shipments }) => {
                 key={shipment.id}
                 className={`p-4 rounded-xl border transition-all ${
                   isCritical
-                    ? 'bg-red-950/30 border-red-500/40 shadow-[0_0_15px_rgba(239,68,68,0.15)]'
+                    ? 'bg-red-950/30 border-red-500/40 shadow-sm'
                     : 'bg-amber-950/20 border-amber-500/30'
                 }`}
               >

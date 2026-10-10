@@ -18,19 +18,19 @@ export function createOrganicPearGeometry(): THREE.BufferGeometry {
     const v = i / vSegments; // 0.0 (calyx bottom) to 1.0 (stem top)
     const y = (v - 0.5) * 2.7; // -1.35 to +1.35
 
-    // Realistic pear profile radius curve R(v)
+    // Realistic, organic pear profile radius curve R(v) — continuously differentiable C1
     let baseR = 0;
     if (v < 0.06) {
       // Calyx bottom cavity indent
       baseR = Math.sin((v / 0.06) * (Math.PI * 0.5)) * 0.42;
     } else if (v < 0.52) {
-      // Bulbous lower body (maximum width around v = 0.32)
+      // Bulbous lower body (smoothly swells from 0.42 at v=0.06 to peak ~1.27 at v=0.30, tapering to 0.85 at v=0.52)
       const t = (v - 0.06) / 0.46;
-      baseR = 0.42 + Math.sin(t * Math.PI) * 0.88 * Math.pow(1.0 - t * 0.2, 0.6);
+      baseR = (0.42 + 0.43 * t) + Math.sin(t * Math.PI) * 0.68 * (1.0 - 0.15 * t);
     } else if (v < 0.72) {
-      // Graceful waist transition tapering into the neck
-      const t = (v - 0.52) / 0.20;
-      baseR = THREE.MathUtils.lerp(0.85, 0.48, Math.sin(t * Math.PI * 0.5));
+      // Graceful waist transition tapering into the neck (C1 Hermite interpolation from 0.85 down to 0.48)
+      const s = (v - 0.52) / 0.20;
+      baseR = 0.85 - 0.6026 * s + 0.2691 * s * s - 0.0365 * s * s * s;
     } else if (v < 0.95) {
       // Slender conical neck
       const t = (v - 0.72) / 0.23;
@@ -38,7 +38,7 @@ export function createOrganicPearGeometry(): THREE.BufferGeometry {
     } else {
       // Top stem basin indent
       const t = (v - 0.95) / 0.05;
-      baseR = THREE.MathUtils.lerp(0.28, 0.12, Math.pow(t, 0.5));
+      baseR = THREE.MathUtils.lerp(0.28, 0.12, Math.sin(t * Math.PI * 0.5));
     }
 
     // Natural belly tilt offset (asymmetry along X)
@@ -487,9 +487,9 @@ export function createReeferTruckMesh(): ReeferTruckMeshResult {
   const reeferUnitGeo = new THREE.BoxGeometry(0.5, 1.3, 1.8);
   geometries.push(reeferUnitGeo);
   const reeferUnitMat = new THREE.MeshStandardMaterial({
-    color: 0x0284c7,
-    roughness: 0.3,
-    metalness: 0.5,
+    color: 0x334155,
+    roughness: 0.35,
+    metalness: 0.65,
   });
   materials.push(reeferUnitMat);
   const reeferUnit = new THREE.Mesh(reeferUnitGeo, reeferUnitMat);
@@ -500,8 +500,8 @@ export function createReeferTruckMesh(): ReeferTruckMeshResult {
   const reeferLedGeo = new THREE.BoxGeometry(0.05, 0.12, 0.4);
   geometries.push(reeferLedGeo);
   const reeferLedMat = new THREE.MeshStandardMaterial({
-    color: 0x38bdf8,
-    emissive: 0x0284c7,
+    color: 0x10b981,
+    emissive: 0x059669,
     emissiveIntensity: 0.8,
   });
   materials.push(reeferLedMat);
@@ -533,11 +533,11 @@ export function createReeferTruckMesh(): ReeferTruckMeshResult {
   const windshieldGeo = new THREE.BoxGeometry(0.08, 0.95, 2.05);
   geometries.push(windshieldGeo);
   const windshieldMat = new THREE.MeshStandardMaterial({
-    color: 0x0ea5e9,
-    roughness: 0.1,
-    metalness: 0.9,
+    color: 0x1e293b,
+    roughness: 0.15,
+    metalness: 0.85,
     transparent: true,
-    opacity: 0.85,
+    opacity: 0.88,
   });
   materials.push(windshieldMat);
   const windshield = new THREE.Mesh(windshieldGeo, windshieldMat);
@@ -761,28 +761,28 @@ export function computeScrollytellingState(pRaw: number, isDesktop: boolean = tr
     // --- PHASE 5: Eurasian Reefer Semi-Trailer Dispatch (0.90 -> 1.00) ---
     const norm = (p - 0.90) / 0.10;
     
-    // Carton slides into truck cargo bay in first 35% of phase 5
-    const cartonInTruck = norm < 0.35;
-    const cartonSlideX = xOffset - norm * 3.5;
-    const cartonSlideZ = -norm * 1.8;
+    // Carton slides into truck cargo bay in first 40% of phase 5
+    const cartonInTruck = norm < 0.40;
+    const cartonSlideX = xOffset - norm * 1.5;
+    const cartonSlideZ = -norm * 1.2;
 
-    // Truck positioning & driving acceleration
+    // Truck positioning & driving acceleration along highway corridor
     let truckX = xOffset;
     let truckZ = -1.2;
     let wheelRot = 0.0;
 
     if (norm < 0.30) {
-      // Truck pulling in
+      // Truck pulling in from right into framing position
       const arriveT = norm / 0.30;
-      truckX = THREE.MathUtils.lerp(xOffset + 5.0, xOffset, arriveT);
-      wheelRot = (xOffset + 5.0 - truckX) * 2.2;
+      truckX = THREE.MathUtils.lerp(xOffset + 4.0, xOffset + 0.3, arriveT);
+      wheelRot = (xOffset + 4.0 - truckX) * 2.2;
     } else {
-      // Truck accelerates along highway corridor into distance
+      // Truck accelerates along highway corridor into perspective distance, remaining clearly visible in frame
       const driveT = (norm - 0.30) / 0.70;
-      const dist = Math.pow(driveT, 2.0) * 32.0;
-      truckX = xOffset - dist;
-      truckZ = -1.2 - dist * 0.75;
-      wheelRot = 11.0 + dist * 2.5;
+      const dist = driveT * 1.5;
+      truckX = (xOffset + 0.3) - dist * 0.4;
+      truckZ = -1.2 - dist * 1.0;
+      wheelRot = 9.0 + dist * 3.5;
     }
 
     return {
@@ -841,10 +841,11 @@ export const PearScrollytelling: React.FC<PearScrollytellingProps> = ({
     const camera = new THREE.PerspectiveCamera(40, width / height, 0.1, 100);
     camera.position.set(0, 0, 7.5);
 
-    // 2. WebGL Renderer with performance limits
+    // 2. WebGL Renderer with performance limits and preserved drawing buffer
     const renderer = new THREE.WebGLRenderer({
       antialias: true,
       alpha: true,
+      preserveDrawingBuffer: true,
       powerPreference: 'high-performance',
     });
     renderer.setSize(width, height);
@@ -866,7 +867,7 @@ export const PearScrollytelling: React.FC<PearScrollytellingProps> = ({
     fillLight.position.set(-5.0, -2.0, 3.0);
     scene.add(fillLight);
 
-    const rimLight = new THREE.DirectionalLight(0x10b981, 1.8);
+    const rimLight = new THREE.DirectionalLight(0xa7f3d0, 1.4);
     rimLight.position.set(0.0, 4.0, -4.0);
     scene.add(rimLight);
 
@@ -944,11 +945,16 @@ export const PearScrollytelling: React.FC<PearScrollytellingProps> = ({
 
     // 7. Animation & Render Loop with Exponential Moving Average Damping
     let animationFrameId: number;
-    const clock = new THREE.Clock();
+    const timer = new THREE.Timer();
 
-    const animate = () => {
+    const animate = (timestamp?: number) => {
       animationFrameId = requestAnimationFrame(animate);
-      const elapsedTime = clock.getElapsedTime();
+      if (timestamp !== undefined) {
+        timer.update(timestamp);
+      } else {
+        timer.update();
+      }
+      const elapsedTime = timer.getElapsed();
 
       // Exponential moving average damping: silky 60fps inertia
       const targetP = targetProgressRef.current;
@@ -1033,6 +1039,7 @@ export const PearScrollytelling: React.FC<PearScrollytellingProps> = ({
           state.truckScale[1],
           state.truckScale[2]
         );
+        truckObj.group.rotation.set(0.0, 0.15, 0.0);
 
         // Rotate all 6 wheels with travel distance
         truckObj.wheels.forEach((wheel) => {

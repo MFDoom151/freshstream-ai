@@ -258,7 +258,7 @@ export const ControlTower: React.FC<ControlTowerProps> = ({ shipmentId, initialT
               onClick={() => setIsStreaming(!isStreaming)}
               className={`flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[11px] font-semibold transition-all cursor-pointer border ${
                 streamConnected
-                  ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40 shadow-[0_0_10px_rgba(16,185,129,0.2)]'
+                  ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40 shadow-sm'
                   : isStreaming
                   ? 'bg-amber-500/20 text-amber-300 border-amber-500/30'
                   : 'bg-slate-800 text-slate-400 border-slate-700 hover:text-white'
@@ -288,7 +288,7 @@ export const ControlTower: React.FC<ControlTowerProps> = ({ shipmentId, initialT
 
       {/* Toast Alert Notification */}
       {toastMessage && (
-        <div className="p-3.5 rounded-xl bg-emerald-950/80 dark:bg-emerald-950/80 light:bg-emerald-50 border border-emerald-500 text-emerald-200 dark:text-emerald-200 light:text-emerald-900 text-xs flex items-center justify-between shadow-[0_0_20px_rgba(16,185,129,0.3)] animate-fadeIn">
+        <div className="p-3.5 rounded-xl bg-emerald-950/80 dark:bg-emerald-950/80 light:bg-emerald-50 border border-emerald-500 text-emerald-200 dark:text-emerald-200 light:text-emerald-900 text-xs flex items-center justify-between shadow-sm animate-fadeIn">
           <div className="flex items-center gap-2.5">
             <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
             <span className="font-medium">{toastMessage}</span>

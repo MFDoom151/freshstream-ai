@@ -330,8 +330,42 @@ async function runBrowserQA() {
         window.dispatchEvent(new Event('scroll'));
       }, cp.pct);
 
-      // Wait 1200ms for Three.js dampening lerp to settle
-      await delay(1200);
+      // Wait 1500ms for Three.js dampening lerp to settle
+      await delay(1500);
+
+      // Verify physically rendered 3D geometry (non-black pixels in right half of canvas)
+      const pixelAudit = await page.evaluate(() => {
+        const canvas = document.querySelector('canvas') as HTMLCanvasElement | null;
+        if (!canvas) return { nonBlackPixels: 0, totalSampled: 0 };
+        try {
+          const gl = canvas.getContext('webgl2') || canvas.getContext('webgl');
+          if (gl) {
+            const width = canvas.width;
+            const height = canvas.height;
+            // The 3D model is framed on the right half (x: 40% to 90%, y: 15% to 85%)
+            const sx = Math.floor(width * 0.40);
+            const sy = Math.floor(height * 0.15);
+            const sw = Math.floor(width * 0.50);
+            const sh = Math.floor(height * 0.70);
+            const pixels = new Uint8Array(sw * sh * 4);
+            gl.readPixels(sx, sy, sw, sh, gl.RGBA, gl.UNSIGNED_BYTE, pixels);
+            let count = 0;
+            for (let i = 0; i < pixels.length; i += 4) {
+              const r = pixels[i];
+              const g = pixels[i + 1];
+              const b = pixels[i + 2];
+              const a = pixels[i + 3];
+              if (a > 15 && (r > 15 || g > 15 || b > 15)) {
+                count++;
+              }
+            }
+            return { nonBlackPixels: count, totalSampled: sw * sh };
+          }
+        } catch {
+          return { nonBlackPixels: 0, totalSampled: 0 };
+        }
+        return { nonBlackPixels: 0, totalSampled: 0 };
+      });
 
       const outPath = path.join(SCREENSHOT_DIR, cp.file);
       await page.screenshot({ path: outPath, fullPage: false });
@@ -340,9 +374,16 @@ async function runBrowserQA() {
       const sizeBytes = exists ? fs.statSync(outPath).size : 0;
 
       recordResult(
+        `Rendered 3D Pixels Visible (${cp.file})`,
+        '3D Graphics',
+        pixelAudit.nonBlackPixels > 100 ? 'PASS' : 'FAIL',
+        `${pixelAudit.nonBlackPixels} non-black pixels detected in 3D frame (${Math.round((pixelAudit.nonBlackPixels / (pixelAudit.totalSampled || 1)) * 100)}% coverage)`
+      );
+
+      recordResult(
         `Capture ${cp.file} (${Math.round(cp.pct * 100)}% scroll)`,
         'Scrollytelling',
-        exists && sizeBytes > 20000 ? 'PASS' : 'FAIL',
+        exists && sizeBytes > 20000 && pixelAudit.nonBlackPixels > 100 ? 'PASS' : 'FAIL',
         `${cp.label} (${Math.round(sizeBytes / 1024)} KB saved to ${cp.file})`
       );
     }
@@ -410,6 +451,11 @@ async function runBrowserQA() {
       isAuthenticated ? 'PASS' : 'FAIL',
       `Session established with NextAuth JWT, landed at ${currentUrl}`
     );
+
+    // Wait for Leaflet map container and map tiles to fully load
+    await page.waitForSelector('.leaflet-container', { timeout: 10000 }).catch(() => {});
+    await page.waitForSelector('.leaflet-tile', { timeout: 8000 }).catch(() => {});
+    await delay(3000); // Allow OSM tiles to fetch and paint onto canvas
 
     // Save dashboard screenshot
     const dashPath = path.join(SCREENSHOT_DIR, 'dashboard.png');
@@ -488,6 +534,16 @@ async function runBrowserQA() {
     await page.goto(`${BASE_URL}/demo`, { waitUntil: 'domcontentloaded', timeout: 15000 });
     const demoLoadDur = Date.now() - demoStart;
 
+    const demoUrl = page.url();
+    const isDirectDemo = demoUrl.endsWith('/demo') && !demoUrl.includes('/dashboard/shipment/');
+
+    recordResult(
+      'Dedicated /demo Served (No 307 Redirect)',
+      'Logistics Twin',
+      isDirectDemo ? 'PASS' : 'FAIL',
+      `Landed directly on ${demoUrl} (HTTP 200 dedicated control tower)`
+    );
+
     recordResult(
       'Demo Page Route Load',
       'Logistics Twin',
@@ -496,8 +552,10 @@ async function runBrowserQA() {
       demoLoadDur
     );
 
-    // Wait for Leaflet map canvas
+    // Wait for Leaflet map canvas and tiles
     await page.waitForSelector('.leaflet-container', { timeout: 10000 });
+    await page.waitForSelector('.leaflet-tile', { timeout: 8000 }).catch(() => {});
+    await delay(3000); // Allow Middle Corridor tracks and tiles to paint
 
     // Verify and switch all 5 transport modes
     const modeAudit = await page.evaluate(() => {
@@ -578,8 +636,8 @@ async function runBrowserQA() {
         : sliderAudit.error || 'Slider failed'
     );
 
-    // Wait 1200ms for Leaflet animations and BHI recalculation
-    await delay(1200);
+    // Wait 2000ms for Leaflet animations and BHI recalculation
+    await delay(2000);
 
     // Save demo map screenshot
     const demoMapPath = path.join(SCREENSHOT_DIR, 'demo-map.png');

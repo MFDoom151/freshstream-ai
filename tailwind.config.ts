@@ -56,6 +56,9 @@ const config: Config = {
           500: '#F59E0B',
         },
       },
+      zIndex: {
+        '-1': '-1',
+      },
       backdropBlur: {
         xs: '2px',
         glass: '12px',

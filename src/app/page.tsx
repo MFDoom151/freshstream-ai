@@ -125,9 +125,10 @@ export default function HomePage() {
   const stageMeta = getStageMeta(scrollProgress);
 
   return (
-    <div className="relative w-full min-h-[480vh]">
+    <div id="homepage-root" data-pear-canvas="true" className="relative w-full min-h-[480vh]">
       {/* 1. Full-Viewport Fixed 3D WebGL Canvas Layer */}
       <div 
+        id="pear-scrollytelling-canvas"
         aria-hidden="true" 
         className="fixed inset-0 -z-10 w-screen h-screen overflow-hidden pointer-events-none"
       >
@@ -140,11 +141,11 @@ export default function HomePage() {
       {/* 2. Contrast Scrim (Ensures WCAG AA Text Contrast across both themes) */}
       <div 
         aria-hidden="true" 
-        className="fixed inset-0 -z-5 w-screen h-screen pointer-events-none bg-gradient-to-r from-slate-950/85 via-slate-950/50 to-transparent dark:block hidden"
+        className="fixed inset-0 -z-1 w-screen h-screen pointer-events-none bg-gradient-to-r from-slate-950/85 via-slate-950/50 to-transparent dark:block hidden"
       />
       <div 
         aria-hidden="true" 
-        className="fixed inset-0 -z-5 w-screen h-screen pointer-events-none bg-gradient-to-r from-white/90 via-white/55 to-transparent dark:hidden block"
+        className="fixed inset-0 -z-1 w-screen h-screen pointer-events-none bg-gradient-to-r from-white/90 via-white/55 to-transparent dark:hidden block"
       />
 
       {/* 3. Narrative Scrollytelling Sections (Chapters 01 to 05) */}

@@ -27,7 +27,7 @@ export const AIConductorBox: React.FC<AIConductorBoxProps> = ({
     <GlassCard
       variant={isCritical ? 'danger' : isWarning ? 'glow-mint' : 'glow-purple'}
       className={`p-6 flex flex-col gap-4 transition-all duration-300 ${
-        isCritical ? 'shadow-[0_0_30px_rgba(239,68,68,0.25)] border-red-500/60' : ''
+        isCritical ? 'shadow-md border-red-500/60' : ''
       }`}
     >
       {/* Header */}
@@ -47,7 +47,7 @@ export const AIConductorBox: React.FC<AIConductorBoxProps> = ({
 
       {/* Critical 14-Hour Rescue Window Pill */}
       {kinetics.rescue_window_hours && (
-        <div className="p-3 rounded-xl bg-red-950/60 dark:bg-red-950/60 light:bg-red-100 border border-red-500/80 text-xs flex items-center justify-between shadow-[0_0_15px_rgba(239,68,68,0.3)] animate-pulse">
+        <div className="p-3 rounded-xl bg-red-950/60 dark:bg-red-950/60 light:bg-red-100 border border-red-500/80 text-xs flex items-center justify-between shadow-sm animate-pulse">
           <div className="flex items-center gap-2">
             <ShieldAlert className="w-4 h-4 text-red-400 dark:text-red-400 light:text-red-600" />
             <span className="font-bold text-red-200 dark:text-red-200 light:text-red-900 uppercase tracking-wide">
