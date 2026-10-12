@@ -52,6 +52,7 @@ export const Header: React.FC = () => {
   }, [mobileMenuOpen]);
 
   const navLinks = [
+    { href: '/demo', label: t('nav.demo') || 'Mission Control', badge: 'GIS' },
     { href: '/dashboard', label: t('nav.dashboard') || 'Dashboard', isLive: true },
     { href: '/dashboard#shipments', label: t('nav.shipments') || 'Shipments' },
     { href: '/dashboard/analytics', label: t('nav.analytics') || 'Analytics' },
@@ -123,6 +124,11 @@ export const Header: React.FC = () => {
                   }`}
                 >
                   {link.label}
+                  {link.badge && (
+                    <span className="px-1.5 py-0.5 text-[9px] font-mono font-bold rounded bg-cyan-500/10 text-cyan-700 dark:text-cyan-400 border border-cyan-500/30">
+                      {link.badge}
+                    </span>
+                  )}
                   {link.isLive && (
                     <span className="px-1.5 py-0.5 text-[9px] font-mono font-bold rounded bg-emerald-500/10 text-emerald-700 dark:text-emerald-400 border border-emerald-500/30">
                       LIVE
@@ -249,7 +255,14 @@ export const Header: React.FC = () => {
                       : 'text-slate-700 hover:text-slate-900 hover:bg-slate-100 dark:text-slate-300 dark:hover:text-white dark:hover:bg-slate-900/60'
                   }`}
                 >
-                  <span>{link.label}</span>
+                  <span className="flex items-center gap-2">
+                    {link.label}
+                    {link.badge && (
+                      <span className="px-1.5 py-0.5 text-[9px] font-mono font-bold rounded bg-cyan-500/10 text-cyan-700 dark:text-cyan-400 border border-cyan-500/30">
+                        {link.badge}
+                      </span>
+                    )}
+                  </span>
                   {link.isLive && (
                     <Badge variant="mint" size="sm" dot>
                       LIVE

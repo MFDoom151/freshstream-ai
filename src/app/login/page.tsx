@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, Suspense } from 'react';
+import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { signIn, useSession } from 'next-auth/react';
 import { useI18n } from '@/lib/i18n/context';
@@ -210,8 +211,19 @@ function LoginForm() {
               </div>
             </div>
 
+            {/* Quick Link to Public Demo without sign-in */}
+            <div className="mt-5 pt-4 border-t border-slate-100 dark:border-slate-800/80 text-center">
+              <Link
+                href="/demo"
+                className="text-xs text-slate-600 hover:text-cyan-600 dark:text-slate-400 dark:hover:text-cyan-300 font-medium transition-colors inline-flex items-center gap-1.5"
+              >
+                <span>Explore Interactive Mission Control Demo without sign-in</span>
+                <ArrowRight className="w-3.5 h-3.5 text-cyan-500" />
+              </Link>
+            </div>
+
             {/* Footer security badge */}
-            <div className="mt-6 flex items-center justify-center gap-2 text-[11px] text-slate-500">
+            <div className="mt-5 flex items-center justify-center gap-2 text-[11px] text-slate-500">
               <Activity className="w-3 h-3 text-emerald-500 animate-pulse" />
               <span>Physics-Informed Biological Protection Active</span>
             </div>

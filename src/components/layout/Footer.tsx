@@ -50,6 +50,12 @@ export const Footer: React.FC = () => {
                 </Link>
               </li>
               <li>
+                <Link href="/demo" className="hover:text-emerald-400 transition-colors flex items-center gap-1.5">
+                  <span>{t('nav.demo') || 'Mission Control Simulator'}</span>
+                  <Badge variant="mint" size="sm">GIS</Badge>
+                </Link>
+              </li>
+              <li>
                 <Link href="/dashboard" className="hover:text-emerald-400 transition-colors flex items-center gap-1.5">
                   <span>{t('nav.dashboard')}</span>
                   <Badge variant="mint" size="sm" dot>LIVE</Badge>

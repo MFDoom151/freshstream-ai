@@ -938,8 +938,77 @@ export const DigitalTwinMap: React.FC<DigitalTwinMapProps> = ({
         </div>
       )}
 
+      {/* 4b. SHIPMENT INSPECTOR (When clicking shipment marker on map) */}
+      {selectedShipment && !selectedEvent && (
+        <div className="absolute bottom-20 left-4 z-[1001] w-full max-w-sm p-4 rounded-2xl bg-slate-950/95 backdrop-blur-xl border border-slate-700 shadow-2xl animate-in fade-in duration-200">
+          <div className="flex items-start justify-between pb-2 border-b border-slate-800">
+            <div>
+              <div className="flex items-center gap-2">
+                <span className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold uppercase ${
+                  selectedShipment.status === 'CRITICAL'
+                    ? 'bg-red-500/20 text-red-400 border border-red-500/40'
+                    : selectedShipment.status === 'WARNING'
+                    ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40'
+                    : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
+                }`}>
+                  {selectedShipment.status}
+                </span>
+                <span className="text-xs font-mono font-bold text-white">{selectedShipment.id}</span>
+              </div>
+              <h4 className="text-sm font-bold text-white mt-1">{selectedShipment.cargoNameEn}</h4>
+            </div>
+            <button
+              type="button"
+              onClick={() => setSelectedShipment(null)}
+              className="p-1 rounded text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+
+          <div className="pt-3 flex flex-col gap-2.5">
+            <div className="text-xs text-slate-300 font-mono">
+              <div className="text-slate-400">Route: <span className="text-white font-semibold">{selectedShipment.origin} → {selectedShipment.destination}</span></div>
+              <div className="text-slate-400 mt-0.5">Waypoint: <span className="text-cyan-400 font-semibold">{selectedShipment.waypointName}</span></div>
+              <div className="text-slate-400 mt-0.5">Carrier: <span className="text-slate-300">{selectedShipment.carrier}</span></div>
+            </div>
+
+            {/* Telemetry Snapshot */}
+            <div className="grid grid-cols-3 gap-2 font-mono text-[11px]">
+              <div className="p-2 rounded-lg bg-slate-900/80 border border-slate-800 flex flex-col">
+                <span className="text-[10px] text-slate-500">TEMP</span>
+                <span className={`font-bold ${selectedShipment.telemetry.temperature > 5 ? 'text-red-400' : 'text-cyan-300'}`}>
+                  {selectedShipment.telemetry.temperature > 0 ? `+${selectedShipment.telemetry.temperature}` : selectedShipment.telemetry.temperature}°C
+                </span>
+              </div>
+              <div className="p-2 rounded-lg bg-slate-900/80 border border-slate-800 flex flex-col">
+                <span className="text-[10px] text-slate-500">BHI HEALTH</span>
+                <span className={`font-bold ${selectedShipment.bhi < 50 ? 'text-red-400' : selectedShipment.bhi < 80 ? 'text-amber-400' : 'text-emerald-400'}`}>
+                  {selectedShipment.bhi}%
+                </span>
+              </div>
+              <div className="p-2 rounded-lg bg-slate-900/80 border border-slate-800 flex flex-col">
+                <span className="text-[10px] text-slate-500">ETA</span>
+                <span className="font-bold text-slate-300">{selectedShipment.eta}</span>
+              </div>
+            </div>
+
+            {/* Direct Link to Shipment Detailed IoT Monitor */}
+            <div className="pt-1">
+              <Link
+                href={`/dashboard/shipment/${selectedShipment.id}`}
+                className="w-full py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors shadow-sm"
+              >
+                <span>Inspect Container IoT Twin</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* 5. WAYPOINT HUB INSPECTOR */}
-      {selectedHub && !selectedEvent && (
+      {selectedHub && !selectedEvent && !selectedShipment && (
         <div className="absolute bottom-20 left-4 z-[1001] w-full max-w-sm p-4 rounded-2xl bg-slate-950/95 backdrop-blur-xl border border-slate-700 shadow-2xl">
           <div className="flex items-start justify-between pb-2 border-b border-slate-800">
             <div>

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { Container } from '@/components/ui/Container';
 import { Badge } from '@/components/ui/Badge';
 import { useI18n } from '@/lib/i18n/context';
@@ -10,7 +11,7 @@ import { QuickStats } from '@/components/dashboard/QuickStats';
 import { AlertsWidget } from '@/components/dashboard/AlertsWidget';
 import { ShipmentsTable } from '@/components/dashboard/ShipmentsTable';
 import { DigitalTwinMapDynamic } from '@/components/map/DigitalTwinMapDynamic';
-import { Activity, ShieldCheck, Radio } from 'lucide-react';
+import { Activity, ShieldCheck, Radio, ArrowUpRight } from 'lucide-react';
 
 export default function DashboardPage() {
   const { t } = useI18n();
@@ -79,7 +80,7 @@ export default function DashboardPage() {
 
         {/* Section 2: Real-World Digital Twin Geospatial Command Center */}
         <div className="mt-8 flex flex-col gap-3">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <div className="flex items-center gap-2">
                 <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
@@ -93,6 +94,15 @@ export default function DashboardPage() {
                 Active reefer rail & ro-pax vessels, critical temperature excursions, and bio-degradation events plotted over real geospatial terrain.
               </p>
             </div>
+
+            <Link
+              href="/demo"
+              className="self-start sm:self-center px-3.5 py-2 rounded-xl bg-slate-900/90 hover:bg-slate-800 border border-slate-700/80 hover:border-cyan-400/80 text-xs font-mono font-bold text-cyan-300 hover:text-white flex items-center gap-2 transition-all shadow-sm shrink-0 cursor-pointer"
+            >
+              <Activity className="w-3.5 h-3.5 text-cyan-400" />
+              <span>Full Mission Control Simulator</span>
+              <ArrowUpRight className="w-3.5 h-3.5 text-cyan-400" />
+            </Link>
           </div>
 
           <DigitalTwinMapDynamic shipments={shipments} />

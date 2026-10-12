@@ -177,7 +177,7 @@ export default function HomePage() {
                   {t('nav.launch_dashboard') || 'Launch Fleet Dashboard'}
                 </Button>
                 <Button
-                  href="/dashboard/shipment/FS-8821"
+                  href="/demo"
                   variant="secondary"
                   size="lg"
                   rightIcon={<Activity className="w-5 h-5" />}
@@ -420,12 +420,20 @@ export default function HomePage() {
                     {t('nav.launch_dashboard') || 'Open Fleet Dashboard'}
                   </Button>
                   <Button
-                    href="/dashboard/shipment/FS-8821"
+                    href="/demo"
                     variant="secondary"
                     size="md"
                     rightIcon={<Activity className="w-4 h-4" />}
                   >
-                    {t('shipments.btn_inspect') || 'Live Control Tower'}
+                    {t('nav.demo') || 'Mission Control Simulator'}
+                  </Button>
+                  <Button
+                    href="/dashboard/shipment/FS-8821"
+                    variant="glass"
+                    size="md"
+                    rightIcon={<Box className="w-4 h-4" />}
+                  >
+                    {t('shipments.btn_inspect') || 'Container Twin'}
                   </Button>
                   <Button
                     href="/dashboard/support"
