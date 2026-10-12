@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import Link from 'next/link';
+import { useI18n } from '@/lib/i18n/context';
 import { ShipmentItem } from '@/types/shipment';
 import { 
   TransportMode, 
@@ -103,6 +104,7 @@ export const DigitalTwinMap: React.FC<DigitalTwinMapProps> = ({
   onTogglePlay: externalTogglePlay,
   className = '',
 }) => {
+  const { t, locale } = useI18n();
   const mapContainerRef = useRef<HTMLDivElement | null>(null);
   const mapInstanceRef = useRef<any>(null);
   const tileLayerRef = useRef<any>(null);
@@ -968,27 +970,27 @@ export const DigitalTwinMap: React.FC<DigitalTwinMapProps> = ({
 
           <div className="pt-3 flex flex-col gap-2.5">
             <div className="text-xs text-slate-300 font-mono">
-              <div className="text-slate-400">Route: <span className="text-white font-semibold">{selectedShipment.origin} → {selectedShipment.destination}</span></div>
-              <div className="text-slate-400 mt-0.5">Waypoint: <span className="text-cyan-400 font-semibold">{selectedShipment.waypointName}</span></div>
-              <div className="text-slate-400 mt-0.5">Carrier: <span className="text-slate-300">{selectedShipment.carrier}</span></div>
+              <div className="text-slate-400">{locale === 'ru' ? 'Маршрут' : locale === 'kz' ? 'Бағыт' : 'Route'}: <span className="text-white font-semibold">{selectedShipment.origin} → {selectedShipment.destination}</span></div>
+              <div className="text-slate-400 mt-0.5">{locale === 'ru' ? 'Хаб / Пункт' : locale === 'kz' ? 'Хаб / Торап' : 'Waypoint'}: <span className="text-cyan-400 font-semibold">{selectedShipment.waypointName}</span></div>
+              <div className="text-slate-400 mt-0.5">{locale === 'ru' ? 'Перевозчик' : locale === 'kz' ? 'Тасымалдаушы' : 'Carrier'}: <span className="text-slate-300">{selectedShipment.carrier}</span></div>
             </div>
 
             {/* Telemetry Snapshot */}
             <div className="grid grid-cols-3 gap-2 font-mono text-[11px]">
               <div className="p-2 rounded-lg bg-slate-900/80 border border-slate-800 flex flex-col">
-                <span className="text-[10px] text-slate-500">TEMP</span>
+                <span className="text-[10px] text-slate-500">{locale === 'ru' ? 'ТЕМП' : locale === 'kz' ? 'ТЕМП' : 'TEMP'}</span>
                 <span className={`font-bold ${selectedShipment.telemetry.temperature > 5 ? 'text-red-400' : 'text-cyan-300'}`}>
                   {selectedShipment.telemetry.temperature > 0 ? `+${selectedShipment.telemetry.temperature}` : selectedShipment.telemetry.temperature}°C
                 </span>
               </div>
               <div className="p-2 rounded-lg bg-slate-900/80 border border-slate-800 flex flex-col">
-                <span className="text-[10px] text-slate-500">BHI HEALTH</span>
+                <span className="text-[10px] text-slate-500">{locale === 'ru' ? 'ИНДЕКС BHI' : locale === 'kz' ? 'BHI ИНДЕКСІ' : 'BHI HEALTH'}</span>
                 <span className={`font-bold ${selectedShipment.bhi < 50 ? 'text-red-400' : selectedShipment.bhi < 80 ? 'text-amber-400' : 'text-emerald-400'}`}>
                   {selectedShipment.bhi}%
                 </span>
               </div>
               <div className="p-2 rounded-lg bg-slate-900/80 border border-slate-800 flex flex-col">
-                <span className="text-[10px] text-slate-500">ETA</span>
+                <span className="text-[10px] text-slate-500">{locale === 'ru' ? 'ПРИБЫТИЕ' : locale === 'kz' ? 'КЕЛУІ' : 'ETA'}</span>
                 <span className="font-bold text-slate-300">{selectedShipment.eta}</span>
               </div>
             </div>
@@ -999,7 +1001,7 @@ export const DigitalTwinMap: React.FC<DigitalTwinMapProps> = ({
                 href={`/dashboard/shipment/${selectedShipment.id}`}
                 className="w-full py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-semibold flex items-center justify-center gap-1.5 transition-colors shadow-sm"
               >
-                <span>Inspect Container IoT Twin</span>
+                <span>{locale === 'ru' ? 'Осмотреть цифровой двойник контейнера' : locale === 'kz' ? 'Контейнердің сандық егізін тексеру' : 'Inspect Container IoT Twin'}</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </Link>
             </div>
@@ -1013,7 +1015,7 @@ export const DigitalTwinMap: React.FC<DigitalTwinMapProps> = ({
           <div className="flex items-start justify-between pb-2 border-b border-slate-800">
             <div>
               <span className="text-[10px] font-mono text-cyan-400 uppercase tracking-wider font-bold">
-                Corridor Hub Infrastructure
+                {locale === 'ru' ? 'Инфраструктура хаба коридора' : locale === 'kz' ? 'Дәліз хабының инфрақұрылымы' : 'Corridor Hub Infrastructure'}
               </span>
               <h4 className="text-sm font-bold text-white">{selectedHub.name}</h4>
             </div>
@@ -1026,10 +1028,10 @@ export const DigitalTwinMap: React.FC<DigitalTwinMapProps> = ({
             </button>
           </div>
           <div className="pt-2 flex flex-col gap-1.5 text-xs font-mono text-slate-300">
-            <div>Country: <span className="text-white font-bold">{selectedHub.country}</span></div>
-            <div>Track Gauge: <span className="text-cyan-400 font-bold">{selectedHub.gaugeMm || 'Standard'}</span></div>
-            <div>Throughput: <span className="text-emerald-400 font-bold">{selectedHub.throughputTeuPerYear}</span></div>
-            <div>Reefer Storage: <span className="text-cyan-300 font-bold">{selectedHub.coldStorageCapacityM3}</span></div>
+            <div>{locale === 'ru' ? 'Страна' : locale === 'kz' ? 'Ел' : 'Country'}: <span className="text-white font-bold">{selectedHub.country}</span></div>
+            <div>{locale === 'ru' ? 'Колея' : locale === 'kz' ? 'Табан' : 'Track Gauge'}: <span className="text-cyan-400 font-bold">{selectedHub.gaugeMm || 'Standard'}</span></div>
+            <div>{locale === 'ru' ? 'Пропускная способность' : locale === 'kz' ? 'Өткізу қабілеті' : 'Throughput'}: <span className="text-emerald-400 font-bold">{selectedHub.throughputTeuPerYear}</span></div>
+            <div>{locale === 'ru' ? 'Рефрижераторные склады' : locale === 'kz' ? 'Рефрижераторлық қоймалар' : 'Reefer Storage'}: <span className="text-cyan-300 font-bold">{selectedHub.coldStorageCapacityM3}</span></div>
             {selectedHub.isGaugeBreak && (
               <div className="mt-1 px-2.5 py-1 rounded bg-indigo-950/60 border border-indigo-500/50 text-indigo-300 text-[11px]">
                 ⇄ Major Break-of-Gauge Facility ({selectedHub.gaugeMm})

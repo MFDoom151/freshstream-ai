@@ -449,6 +449,11 @@ export interface TranslationDictionary {
     alert_action_required: string;
     alert_dismiss: string;
     filter_all: string;
+    gis_title: string;
+    gis_badge: string;
+    gis_sub: string;
+    gis_btn_demo: string;
+    bio_twin_badge: string;
   };
 
   // Shipments Table
@@ -539,5 +544,91 @@ export interface TranslationDictionary {
     session_active: string;
     operator_role: string;
     admin_role: string;
+  };
+
+  // 3D Pear Scrollytelling Story Chapters
+  story: {
+    // HUD & Navigation
+    scrubber_step_1: string;
+    scrubber_step_2: string;
+    scrubber_step_3: string;
+    scrubber_step_4: string;
+    scrubber_step_5: string;
+    hud_bhi_lbl: string;
+    hud_temp_lbl: string;
+    hud_ethanol_lbl: string;
+
+    // Stage metadata labels & statuses
+    stage_1_label: string;
+    stage_1_title: string;
+    stage_1_status: string;
+    stage_2_label: string;
+    stage_2_title: string;
+    stage_2_status: string;
+    stage_3_label: string;
+    stage_3_title: string;
+    stage_3_status: string;
+    stage_4_label: string;
+    stage_4_title: string;
+    stage_4_status: string;
+    stage_5_label: string;
+    stage_5_title: string;
+    stage_5_status: string;
+
+    // Chapter 01
+    ch1_badge: string;
+    ch1_baseline: string;
+    ch1_title: string;
+    ch1_desc: string;
+    ch1_metric_health: string;
+    ch1_metric_temp: string;
+    ch1_metric_ethanol: string;
+
+    // Chapter 02
+    ch2_badge: string;
+    ch2_status_badge: string;
+    ch2_title: string;
+    ch2_desc: string;
+    ch2_warning_title: string;
+    ch2_warning_desc: string;
+    ch2_metric_health: string;
+    ch2_metric_temp: string;
+    ch2_metric_gas: string;
+
+    // Chapter 03
+    ch3_badge: string;
+    ch3_status_badge: string;
+    ch3_title: string;
+    ch3_desc: string;
+    ch3_rescue_title: string;
+    ch3_rescue_desc: string;
+    ch3_metric_saved: string;
+    ch3_metric_window: string;
+    ch3_metric_roi: string;
+
+    // Chapter 04
+    ch4_badge: string;
+    ch4_status_badge: string;
+    ch4_title: string;
+    ch4_desc: string;
+    ch4_feat1_title: string;
+    ch4_feat1_desc: string;
+    ch4_feat2_title: string;
+    ch4_feat2_desc: string;
+    ch4_sealed: string;
+    ch4_id: string;
+
+    // Chapter 05
+    ch5_badge: string;
+    ch5_status_badge: string;
+    ch5_title: string;
+    ch5_desc: string;
+    ch5_btn_dashboard: string;
+    ch5_btn_demo: string;
+    ch5_btn_twin: string;
+    ch5_btn_support: string;
+    ch5_pillar_iot: string;
+    ch5_pillar_ai: string;
+    ch5_pillar_dcsa: string;
   };
 }

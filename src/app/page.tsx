@@ -55,12 +55,12 @@ export default function HomePage() {
     if (p < 0.30) {
       return {
         step: '01 / 05',
-        label: 'HARVEST & BASELINE',
-        title: 'Fresh Agricultural Asset',
+        label: t('story.stage_1_label') || 'HARVEST & BASELINE',
+        title: t('story.stage_1_title') || 'Fresh Agricultural Asset',
         bhi: '99.8%',
         temp: '+0.8°C [OPTIMAL]',
         ethanol: '2.4 ppm',
-        status: 'Pristine Asian Bartlett Pear • Baseline Remaining Shelf-Life: 30 Days',
+        status: t('story.stage_1_status') || 'Pristine Asian Bartlett Pear • Baseline Remaining Shelf-Life: 30 Days',
         badgeVariant: 'mint' as const,
         color: 'text-emerald-400 dark:text-emerald-400',
         borderColor: 'border-emerald-500/50',
@@ -69,12 +69,12 @@ export default function HomePage() {
       const decayPct = Math.round(((p - 0.30) / 0.30) * 100);
       return {
         step: '02 / 05',
-        label: 'THERMAL SPOILAGE',
-        title: 'Thermal Abuse & Rot Active',
+        label: t('story.stage_2_label') || 'THERMAL SPOILAGE',
+        title: t('story.stage_2_title') || 'Thermal Abuse & Rot Active',
         bhi: `${Math.max(15, 100 - decayPct)}%`,
         temp: `+${(1.5 + (decayPct / 100) * 8.0).toFixed(1)}°C [CRITICAL HEAT]`,
         ethanol: `${(3.0 + (decayPct / 100) * 32.0).toFixed(1)} ppm`,
-        status: `Reefer Failure • Necrotic Lesions • Fungal Mold Spores (${decayPct}% decayed)`,
+        status: `${t('story.stage_2_status') || 'Reefer Failure • Necrotic Lesions • Fungal Mold Spores'} (${decayPct}%)`,
         badgeVariant: 'danger' as const,
         color: 'text-rose-400 dark:text-rose-400',
         borderColor: 'border-rose-500/50',
@@ -83,12 +83,12 @@ export default function HomePage() {
       const recPct = Math.round(((p - 0.60) / 0.15) * 100);
       return {
         step: '03 / 05',
-        label: 'ARRHENIUS RECOVERY',
-        title: 'Biological Digital Twin Restoration',
+        label: t('story.stage_3_label') || 'ARRHENIUS RECOVERY',
+        title: t('story.stage_3_title') || 'Biological Digital Twin Restoration',
         bhi: `${Math.min(100, 45 + Math.round(recPct * 0.55))}% [RESTORING]`,
         temp: '+1.2°C [QUENCHED]',
         ethanol: '3.1 ppm',
-        status: 'Arrhenius Kinetics Halted Decay • Respiration Quenched • Tissue Rehydrated',
+        status: t('story.stage_3_status') || 'Arrhenius Kinetics Halted Decay • Respiration Quenched • Tissue Rehydrated',
         badgeVariant: 'purple' as const,
         color: 'text-cyan-400 dark:text-cyan-400',
         borderColor: 'border-cyan-500/50',
@@ -96,12 +96,12 @@ export default function HomePage() {
     } else if (p < 0.90) {
       return {
         step: '04 / 05',
-        label: 'SMART PACKAGING',
-        title: 'Insulated Carton Encapsulation',
+        label: t('story.stage_4_label') || 'SMART PACKAGING',
+        title: t('story.stage_4_title') || 'Insulated Carton Encapsulation',
         bhi: '100.0%',
         temp: '+0.5°C [PULSE-COOLED]',
         ethanol: '2.1 ppm',
-        status: 'Hermetic Silicone Gaskets • CA Nitrogen Atmosphere • IoT Sensor Puck Active',
+        status: t('story.stage_4_status') || 'Hermetic Silicone Gaskets • CA Nitrogen Atmosphere • IoT Sensor Puck Active',
         badgeVariant: 'mint' as const,
         color: 'text-emerald-400 dark:text-emerald-400',
         borderColor: 'border-emerald-500/50',
@@ -109,12 +109,12 @@ export default function HomePage() {
     } else {
       return {
         step: '05 / 05',
-        label: 'HIGHWAY DISPATCH',
-        title: 'Reefer Semi-Trailer En Route',
+        label: t('story.stage_5_label') || 'HIGHWAY DISPATCH',
+        title: t('story.stage_5_title') || 'Reefer Semi-Trailer En Route',
         bhi: '100.0%',
         temp: '+1.0°C [DCSA MONITORED]',
         ethanol: '2.0 ppm',
-        status: 'Dispatched via Trans-Caspian Silk Road • Transit Hub: Port Kuryk (Day 1 / 18)',
+        status: t('story.stage_5_status') || 'Dispatched via Trans-Caspian Silk Road • Transit Hub: Port Kuryk (Day 1 / 18)',
         badgeVariant: 'purple' as const,
         color: 'text-indigo-400 dark:text-indigo-400',
         borderColor: 'border-indigo-500/50',
@@ -197,31 +197,31 @@ export default function HomePage() {
               <div className="mt-4 p-6 sm:p-7 rounded-2xl bg-white/90 dark:bg-slate-950/85 backdrop-blur-md border border-slate-200/90 dark:border-slate-800/80 shadow-xl">
                 <div className="flex items-center justify-between mb-3">
                   <span className="text-xs font-mono font-bold tracking-wider text-emerald-600 dark:text-emerald-400 uppercase">
-                    CHAPTER 01 • HARVEST ORIGIN
+                    {t('story.ch1_badge')}
                   </span>
                   <span className="text-xs font-mono text-slate-500 dark:text-slate-400">
-                    Baseline: Day 0
+                    {t('story.ch1_baseline')}
                   </span>
                 </div>
                 <h2 className="text-xl font-bold text-slate-900 dark:text-white mb-2">
-                  Pristine Agricultural Asset (Pyrus pyrifolia)
+                  {t('story.ch1_title')}
                 </h2>
                 <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed mb-4">
-                  Freshly harvested Bartlett/Asian pear with waxy cuticle gloss, active cellular respiration, and crisp turgor pressure. Baseline Remaining Shelf-Life: 30 days under continuous optimal refrigeration.
+                  {t('story.ch1_desc')}
                 </p>
 
                 {/* Key Metrics */}
                 <div className="grid grid-cols-3 gap-3 pt-3 border-t border-slate-200/80 dark:border-slate-800/80 font-mono text-xs">
                   <div>
-                    <span className="text-slate-500 dark:text-slate-400 block text-[10px]">HEALTH (BHI)</span>
+                    <span className="text-slate-500 dark:text-slate-400 block text-[10px]">{t('story.ch1_metric_health')}</span>
                     <span className="text-emerald-600 dark:text-emerald-400 font-bold text-base">99.8%</span>
                   </div>
                   <div>
-                    <span className="text-slate-500 dark:text-slate-400 block text-[10px]">CORE TEMP</span>
+                    <span className="text-slate-500 dark:text-slate-400 block text-[10px]">{t('story.ch1_metric_temp')}</span>
                     <span className="text-cyan-600 dark:text-cyan-400 font-bold text-base">+0.8°C</span>
                   </div>
                   <div>
-                    <span className="text-slate-500 dark:text-slate-400 block text-[10px]">VOC ETHANOL</span>
+                    <span className="text-slate-500 dark:text-slate-400 block text-[10px]">{t('story.ch1_metric_ethanol')}</span>
                     <span className="text-amber-600 dark:text-amber-400 font-bold text-base">2.4 ppm</span>
                   </div>
                 </div>
@@ -238,43 +238,43 @@ export default function HomePage() {
                 <div className="flex items-center gap-2 mb-3">
                   <span className="text-xs font-mono font-bold tracking-wider text-rose-600 dark:text-rose-400 uppercase flex items-center gap-1.5">
                     <AlertTriangle className="w-3.5 h-3.5" />
-                    CHAPTER 02 • TRANSIT BOTTLENECK
+                    {t('story.ch2_badge')}
                   </span>
                   <span className="text-slate-400 dark:text-slate-600">•</span>
                   <span className="text-xs font-mono text-rose-600 dark:text-rose-400 font-semibold">
-                    Thermal Abuse Excursion
+                    {t('story.ch2_status_badge')}
                   </span>
                 </div>
 
                 <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white mb-3">
-                  Up to 30% Cargo Loss at Port Bottlenecks
+                  {t('story.ch2_title')}
                 </h2>
 
                 <p className="text-sm sm:text-base text-slate-600 dark:text-slate-300 leading-relaxed mb-4">
-                  Along the Trans-Caspian Middle Corridor, 80% of cargo losses occur at ferry staging bottlenecks like Port Kuryk, Aktau, and Baku. When reefers fail or power drops during 4-day customs queues, delayed decisions cost <span className="font-semibold text-rose-600 dark:text-rose-400">~$400 per hour</span>.
+                  {t('story.ch2_desc')}
                 </p>
 
                 <div className="p-4 rounded-xl bg-rose-50 dark:bg-rose-950/30 border border-rose-200 dark:border-rose-900/50 mb-4">
                   <h3 className="text-xs font-bold font-mono text-rose-700 dark:text-rose-300 uppercase mb-1">
-                    Pathological Cellular Decay
+                    {t('story.ch2_warning_title')}
                   </h3>
                   <p className="text-xs text-rose-900 dark:text-rose-200/90 leading-relaxed">
-                    Elevated temperatures accelerate enzymatic pectin hydrolysis. Necrotic lesions expand across the epidermis, cellular dehydration causes severe surface wrinkling, and fungal mycelium mold blooms across the fruit core.
+                    {t('story.ch2_warning_desc')}
                   </p>
                 </div>
 
                 {/* Telemetry Warning Gauges */}
                 <div className="grid grid-cols-3 gap-3 pt-3 border-t border-slate-200 dark:border-slate-800 font-mono text-xs">
                   <div>
-                    <span className="text-slate-500 dark:text-slate-400 block text-[10px]">HEALTH INDEX</span>
+                    <span className="text-slate-500 dark:text-slate-400 block text-[10px]">{t('story.ch2_metric_health')}</span>
                     <span className="text-rose-600 dark:text-rose-400 font-bold text-base">32.4%</span>
                   </div>
                   <div>
-                    <span className="text-slate-500 dark:text-slate-400 block text-[10px]">EXCURSION TEMP</span>
+                    <span className="text-slate-500 dark:text-slate-400 block text-[10px]">{t('story.ch2_metric_temp')}</span>
                     <span className="text-rose-600 dark:text-rose-400 font-bold text-base">+9.2°C</span>
                   </div>
                   <div>
-                    <span className="text-slate-500 dark:text-slate-400 block text-[10px]">FERMENTATION GAS</span>
+                    <span className="text-slate-500 dark:text-slate-400 block text-[10px]">{t('story.ch2_metric_gas')}</span>
                     <span className="text-amber-600 dark:text-amber-400 font-bold text-base">36.8 ppm</span>
                   </div>
                 </div>
@@ -291,43 +291,43 @@ export default function HomePage() {
                 <div className="flex items-center gap-2 mb-3">
                   <span className="text-xs font-mono font-bold tracking-wider text-cyan-600 dark:text-cyan-400 uppercase flex items-center gap-1.5">
                     <RotateCcw className="w-3.5 h-3.5" />
-                    CHAPTER 03 • AI RESCUE
+                    {t('story.ch3_badge')}
                   </span>
                   <span className="text-slate-400 dark:text-slate-600">•</span>
                   <span className="text-xs font-mono text-cyan-600 dark:text-cyan-400 font-semibold">
-                    Biological Digital Twin
+                    {t('story.ch3_status_badge')}
                   </span>
                 </div>
 
                 <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white mb-3">
-                  Physics-Informed Arrhenius Time Reversal
+                  {t('story.ch3_title')}
                 </h2>
 
                 <p className="text-sm sm:text-base text-slate-600 dark:text-slate-300 leading-relaxed mb-4">
-                  FreshStream AI models decay using the modified Arrhenius Kinetic Equation: <span className="font-mono text-xs bg-slate-100 dark:bg-slate-900 px-2 py-0.5 rounded text-cyan-600 dark:text-cyan-300">k = A · e^(-Ea / (R·T))</span>. On-edge TinyML ethanol sensing detects anaerobic fermentation within the first 14 hours—triggering autonomous cooling interventions before cargo crosses the point of no return.
+                  {t('story.ch3_desc')}
                 </p>
 
                 <div className="p-4 rounded-xl bg-cyan-50 dark:bg-cyan-950/30 border border-cyan-200 dark:border-cyan-900/50 mb-4">
                   <h3 className="text-xs font-bold font-mono text-cyan-700 dark:text-cyan-300 uppercase mb-1">
-                    Tissue Rehydration & Recovery
+                    {t('story.ch3_rescue_title')}
                   </h3>
                   <p className="text-xs text-cyan-900 dark:text-cyan-200/90 leading-relaxed">
-                    AI Conductor prescribes immediate pulse-cooling and controlled ventilation. Enzymatic degradation halts, necrotic lesions regress, cellular turgor restores, and biological shelf-life is fully recovered.
+                    {t('story.ch3_rescue_desc')}
                   </p>
                 </div>
 
                 {/* Saved Value Metrics */}
                 <div className="grid grid-cols-3 gap-3 pt-3 border-t border-slate-200 dark:border-slate-800 font-mono text-xs">
                   <div>
-                    <span className="text-slate-500 dark:text-slate-400 block text-[10px]">SAVED CARGO</span>
+                    <span className="text-slate-500 dark:text-slate-400 block text-[10px]">{t('story.ch3_metric_saved')}</span>
                     <span className="text-emerald-600 dark:text-emerald-400 font-bold text-base">$15,000</span>
                   </div>
                   <div>
-                    <span className="text-slate-500 dark:text-slate-400 block text-[10px]">RECOVERY WINDOW</span>
+                    <span className="text-slate-500 dark:text-slate-400 block text-[10px]">{t('story.ch3_metric_window')}</span>
                     <span className="text-cyan-600 dark:text-cyan-400 font-bold text-base">14 Hours</span>
                   </div>
                   <div>
-                    <span className="text-slate-500 dark:text-slate-400 block text-[10px]">EXPORTER ROI</span>
+                    <span className="text-slate-500 dark:text-slate-400 block text-[10px]">{t('story.ch3_metric_roi')}</span>
                     <span className="text-purple-600 dark:text-purple-400 font-bold text-base">1150%</span>
                   </div>
                 </div>
@@ -344,30 +344,30 @@ export default function HomePage() {
                 <div className="flex items-center gap-2 mb-3">
                   <span className="text-xs font-mono font-bold tracking-wider text-emerald-600 dark:text-emerald-400 uppercase flex items-center gap-1.5">
                     <Box className="w-3.5 h-3.5" />
-                    CHAPTER 04 • ENCAPSULATION
+                    {t('story.ch4_badge')}
                   </span>
                   <span className="text-slate-400 dark:text-slate-600">•</span>
                   <span className="text-xs font-mono text-emerald-600 dark:text-emerald-400 font-semibold">
-                    Controlled Atmosphere
+                    {t('story.ch4_status_badge')}
                   </span>
                 </div>
 
                 <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white mb-3">
-                  Insulated Smart Carton & Edge IoT Puck
+                  {t('story.ch4_title')}
                 </h2>
 
                 <p className="text-sm sm:text-base text-slate-600 dark:text-slate-300 leading-relaxed mb-4">
-                  The restored agricultural asset descends into FreshStream’s smart insulated cold-chain carton. Dual precision flaps seal flush with hermetic gaskets, while the integrated Edge IoT Sensor Puck locks into autonomous biological monitoring.
+                  {t('story.ch4_desc')}
                 </p>
 
                 <div className="grid grid-cols-2 gap-3 mb-4">
                   <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800">
-                    <span className="text-xs font-bold text-slate-900 dark:text-white block mb-1">Insulated Liner</span>
-                    <span className="text-xs text-slate-600 dark:text-slate-400">Reflective thermal barrier maintains sub-degree stability for 72 hours without external power.</span>
+                    <span className="text-xs font-bold text-slate-900 dark:text-white block mb-1">{t('story.ch4_feat1_title')}</span>
+                    <span className="text-xs text-slate-600 dark:text-slate-400">{t('story.ch4_feat1_desc')}</span>
                   </div>
                   <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800">
-                    <span className="text-xs font-bold text-slate-900 dark:text-white block mb-1">IoT Puck Node</span>
-                    <span className="text-xs text-slate-600 dark:text-slate-400">Continuous telemetry: Temp, Humidity, G-Shock, and VOC Ethanol streamed via LoRaWAN.</span>
+                    <span className="text-xs font-bold text-slate-900 dark:text-white block mb-1">{t('story.ch4_feat2_title')}</span>
+                    <span className="text-xs text-slate-600 dark:text-slate-400">{t('story.ch4_feat2_desc')}</span>
                   </div>
                 </div>
 
@@ -375,10 +375,10 @@ export default function HomePage() {
                 <div className="flex items-center justify-between pt-3 border-t border-slate-200 dark:border-slate-800 font-mono text-xs">
                   <span className="text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1.5">
                     <CheckCircle2 className="w-4 h-4" />
-                    Carton Hermetically Sealed
+                    {t('story.ch4_sealed')}
                   </span>
                   <span className="text-slate-500 dark:text-slate-400">
-                    ID: KZ-REEF-8942
+                    {t('story.ch4_id')}
                   </span>
                 </div>
               </div>
@@ -394,20 +394,20 @@ export default function HomePage() {
                 <div className="flex items-center gap-2 mb-3">
                   <span className="text-xs font-mono font-bold tracking-wider text-indigo-600 dark:text-indigo-400 uppercase flex items-center gap-1.5">
                     <Truck className="w-3.5 h-3.5" />
-                    CHAPTER 05 • DISPATCH
+                    {t('story.ch5_badge')}
                   </span>
                   <span className="text-slate-400 dark:text-slate-600">•</span>
                   <span className="text-xs font-mono text-indigo-600 dark:text-indigo-400 font-semibold">
-                    Silk Road Corridor
+                    {t('story.ch5_status_badge')}
                   </span>
                 </div>
 
                 <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white mb-3">
-                  Autonomous Reefer Semi-Trailer Dispatch
+                  {t('story.ch5_title')}
                 </h2>
 
                 <p className="text-sm sm:text-base text-slate-600 dark:text-slate-300 leading-relaxed mb-4">
-                  Loaded and sealed, the refrigerated semi-trailer departs along the Trans-Caspian International Transport Route (TITR) corridor—connecting Central Asia to European and Gulf markets via Port Kuryk, Baku, Poti, and Istanbul.
+                  {t('story.ch5_desc')}
                 </p>
 
                 <div className="flex flex-wrap gap-3 mb-6">
@@ -417,7 +417,7 @@ export default function HomePage() {
                     size="md"
                     rightIcon={<ArrowRight className="w-4 h-4" />}
                   >
-                    {t('nav.launch_dashboard') || 'Open Fleet Dashboard'}
+                    {t('story.ch5_btn_dashboard')}
                   </Button>
                   <Button
                     href="/demo"
@@ -425,7 +425,7 @@ export default function HomePage() {
                     size="md"
                     rightIcon={<Activity className="w-4 h-4" />}
                   >
-                    {t('nav.demo') || 'Mission Control Simulator'}
+                    {t('story.ch5_btn_demo')}
                   </Button>
                   <Button
                     href="/dashboard/shipment/FS-8821"
@@ -433,14 +433,14 @@ export default function HomePage() {
                     size="md"
                     rightIcon={<Box className="w-4 h-4" />}
                   >
-                    {t('shipments.btn_inspect') || 'Container Twin'}
+                    {t('story.ch5_btn_twin')}
                   </Button>
                   <Button
                     href="/dashboard/support"
                     variant="outline"
                     size="md"
                   >
-                    {t('nav.support') || 'Enterprise Contact'}
+                    {t('story.ch5_btn_support')}
                   </Button>
                 </div>
 
@@ -448,15 +448,15 @@ export default function HomePage() {
                 <div className="grid grid-cols-3 gap-3 pt-4 border-t border-slate-200 dark:border-slate-800 text-xs">
                   <div className="flex items-center gap-2 text-slate-700 dark:text-slate-300">
                     <Radio className="w-4 h-4 text-emerald-500 shrink-0" />
-                    <span>Edge IoT</span>
+                    <span>{t('story.ch5_pillar_iot')}</span>
                   </div>
                   <div className="flex items-center gap-2 text-slate-700 dark:text-slate-300">
                     <Cpu className="w-4 h-4 text-purple-500 shrink-0" />
-                    <span>Arrhenius AI</span>
+                    <span>{t('story.ch5_pillar_ai')}</span>
                   </div>
                   <div className="flex items-center gap-2 text-slate-700 dark:text-slate-300">
                     <ShieldCheck className="w-4 h-4 text-cyan-500 shrink-0" />
-                    <span>DCSA 3.0</span>
+                    <span>{t('story.ch5_pillar_dcsa')}</span>
                   </div>
                 </div>
               </div>
@@ -491,17 +491,17 @@ export default function HomePage() {
             {/* Gauges */}
             <div className="flex items-center gap-3 font-mono text-[11px]">
               <div>
-                <span className="text-slate-500 dark:text-slate-400 mr-1.5">BHI:</span>
+                <span className="text-slate-500 dark:text-slate-400 mr-1.5">{t('story.hud_bhi_lbl')}:</span>
                 <span className={`font-bold ${stageMeta.color}`}>{stageMeta.bhi}</span>
               </div>
               <div className="w-px h-3 bg-slate-300 dark:bg-slate-700" />
               <div>
-                <span className="text-slate-500 dark:text-slate-400 mr-1.5">TEMP:</span>
+                <span className="text-slate-500 dark:text-slate-400 mr-1.5">{t('story.hud_temp_lbl')}:</span>
                 <span className="text-cyan-600 dark:text-cyan-300 font-bold">{stageMeta.temp}</span>
               </div>
               <div className="w-px h-3 bg-slate-300 dark:bg-slate-700" />
               <div>
-                <span className="text-slate-500 dark:text-slate-400 mr-1.5">ETHANOL:</span>
+                <span className="text-slate-500 dark:text-slate-400 mr-1.5">{t('story.hud_ethanol_lbl')}:</span>
                 <span className="text-amber-600 dark:text-amber-300 font-bold">{stageMeta.ethanol}</span>
               </div>
             </div>
@@ -531,35 +531,35 @@ export default function HomePage() {
               onClick={() => handleScrollToProgress(0.05)}
               className={`text-left hover:text-emerald-500 dark:hover:text-emerald-400 transition-colors ${scrollProgress < 0.30 ? 'text-emerald-600 dark:text-emerald-400 font-bold' : ''}`}
             >
-              1. Harvest
+              {t('story.scrubber_step_1')}
             </button>
             <button 
               type="button"
               onClick={() => handleScrollToProgress(0.45)}
               className={`text-center hover:text-rose-500 dark:hover:text-rose-400 transition-colors ${scrollProgress >= 0.30 && scrollProgress < 0.60 ? 'text-rose-600 dark:text-rose-400 font-bold' : ''}`}
             >
-              2. Rot
+              {t('story.scrubber_step_2')}
             </button>
             <button 
               type="button"
               onClick={() => handleScrollToProgress(0.68)}
               className={`text-center hover:text-cyan-500 dark:hover:text-cyan-400 transition-colors ${scrollProgress >= 0.60 && scrollProgress < 0.75 ? 'text-cyan-600 dark:text-cyan-400 font-bold' : ''}`}
             >
-              3. AI Twin
+              {t('story.scrubber_step_3')}
             </button>
             <button 
               type="button"
               onClick={() => handleScrollToProgress(0.82)}
               className={`text-center hover:text-emerald-500 dark:hover:text-emerald-400 transition-colors ${scrollProgress >= 0.75 && scrollProgress < 0.90 ? 'text-emerald-600 dark:text-emerald-400 font-bold' : ''}`}
             >
-              4. Carton
+              {t('story.scrubber_step_4')}
             </button>
             <button 
               type="button"
               onClick={() => handleScrollToProgress(0.98)}
               className={`text-right hover:text-indigo-500 dark:hover:text-indigo-400 transition-colors ${scrollProgress >= 0.90 ? 'text-indigo-600 dark:text-indigo-400 font-bold' : ''}`}
             >
-              5. Dispatch
+              {t('story.scrubber_step_5')}
             </button>
           </div>
 

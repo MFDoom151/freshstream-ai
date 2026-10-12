@@ -75,7 +75,7 @@ const DigitalTwinMap = dynamic(() => import('@/components/map/DigitalTwinMap'), 
 });
 
 export default function DemoPage() {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
 
   // Active Transport Modality State
   const [activeMode, setActiveMode] = useState<TransportMode>('MULTIMODAL_COMBO');
@@ -282,14 +282,18 @@ export default function DemoPage() {
               <div>
                 <div className="flex items-center gap-2">
                   <h1 className="text-base sm:text-lg font-bold text-white tracking-tight">
-                    Trans-Caspian Digital Twin & Control Tower
+                    {locale === 'ru' ? 'Транскаспийский цифровой двойник и Control Tower' : locale === 'kz' ? 'Транскаспийлік сандық егіз және Control Tower' : 'Trans-Caspian Digital Twin & Control Tower'}
                   </h1>
                   <Badge variant="mint" size="sm" dot>
-                    PRODUCTION SIMULATOR
+                    {locale === 'ru' ? 'ПРОИЗВОДСТВЕННЫЙ СИМУЛЯТОР' : locale === 'kz' ? 'ӨНДІРІСТІК СИМУЛЯТОР' : 'PRODUCTION SIMULATOR'}
                   </Badge>
                 </div>
                 <p className="text-xs text-slate-400">
-                  Real-time IoT Telemetry, Arrhenius Biological Kinetics & Multimodal Route Optimization
+                  {locale === 'ru' 
+                    ? 'IoT-телеметрия в реальном времени, кинетика Аррениуса и мультимодальная оптимизация маршрутов' 
+                    : locale === 'kz' 
+                    ? 'Нақты уақыттағы IoT телеметриясы, Аррениус кинетикасы және мультимодальды маршрутты оңтайландыру' 
+                    : 'Real-time IoT Telemetry, Arrhenius Biological Kinetics & Multimodal Route Optimization'}
                 </p>
               </div>
             </div>
@@ -302,14 +306,14 @@ export default function DemoPage() {
                 className="px-3 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 border border-slate-700/80 text-xs font-mono text-slate-200 hover:text-white flex items-center gap-1.5 transition-colors cursor-pointer shadow-sm"
               >
                 <Code className="w-3.5 h-3.5 text-cyan-400" />
-                <span>Logistics Standards Schemas</span>
+                {locale === 'ru' ? <span>Схемы логистических стандартов</span> : locale === 'kz' ? <span>Логистикалық стандарттар сұлбасы</span> : <span>Logistics Standards Schemas</span>}
               </button>
 
               <Link
                 href="/dashboard"
                 className="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-xs font-semibold text-white flex items-center gap-1 transition-colors shadow-sm"
               >
-                <span>Live Fleet</span>
+                {locale === 'ru' ? <span>Флот online</span> : locale === 'kz' ? <span>Флот online</span> : <span>Live Fleet</span>}
                 <ChevronRight className="w-3.5 h-3.5" />
               </Link>
             </div>
@@ -325,16 +329,16 @@ export default function DemoPage() {
             <div className="flex items-center justify-between text-xs text-slate-400 font-mono mb-2">
               <span className="flex items-center gap-1.5">
                 <Layers className="w-3.5 h-3.5 text-cyan-400" />
-                <span>CORRIDOR SCOPE</span>
+                <span>{locale === 'ru' ? 'ОХВАТ КОРИДОРА' : locale === 'kz' ? 'ДӘЛІЗ АУҚЫМЫ' : 'CORRIDOR SCOPE'}</span>
               </span>
               <span className="text-emerald-400 font-bold">TITR SYNC</span>
             </div>
             <div>
               <div className="text-lg sm:text-xl font-bold text-white tracking-tight">
-                4,500 km Route
+                {locale === 'ru' ? 'Маршрут 4 500 км' : locale === 'kz' ? '4 500 км маршрут' : '4,500 km Route'}
               </div>
               <div className="text-xs text-slate-400 font-mono mt-0.5">
-                16 Hubs • 2 Gauge-Breaks • 1 Ro-Pax Ferry
+                {locale === 'ru' ? '16 хабов • 2 смены колеи • 1 паром Ro-Pax' : locale === 'kz' ? '16 хаб • 2 табан ауыстыру • 1 Ro-Pax паромы' : '16 Hubs • 2 Gauge-Breaks • 1 Ro-Pax Ferry'}
               </div>
             </div>
           </div>
@@ -344,7 +348,7 @@ export default function DemoPage() {
             <div className="flex items-center justify-between text-xs text-slate-400 font-mono mb-2">
               <span className="flex items-center gap-1.5">
                 <Activity className="w-3.5 h-3.5 text-emerald-400" />
-                <span>BIOLOGICAL HEALTH (BHI)</span>
+                <span>{locale === 'ru' ? 'ИНДЕКС ЗДОРОВЬЯ (BHI)' : locale === 'kz' ? 'ДЕНСАУЛЫҚ ИНДЕКСІ (BHI)' : 'BIOLOGICAL HEALTH (BHI)'}</span>
               </span>
               <span className={`font-bold ${
                 calculations.bhi >= 80 ? 'text-emerald-400' : calculations.bhi >= 60 ? 'text-amber-400' : 'text-red-400'
@@ -360,7 +364,7 @@ export default function DemoPage() {
                   {calculations.bhi}%
                 </span>
                 <span className="text-xs text-slate-400 font-mono">
-                  {calculations.accelerationFactor}x decay rate
+                  {calculations.accelerationFactor}x {locale === 'ru' ? 'скорость распада' : locale === 'kz' ? 'ыдырау жылдамдығы' : 'decay rate'}
                 </span>
               </div>
               <div className="w-full bg-slate-800 rounded-full h-1.5 mt-2 overflow-hidden">
@@ -379,16 +383,16 @@ export default function DemoPage() {
             <div className="flex items-center justify-between text-xs text-slate-400 font-mono mb-2">
               <span className="flex items-center gap-1.5">
                 <ShieldCheck className="w-3.5 h-3.5 text-indigo-400" />
-                <span>REMAINING SHELF LIFE</span>
+                <span>{locale === 'ru' ? 'ОСТАТОЧНЫЙ СРОК ГОДНОСТИ' : locale === 'kz' ? 'ҚАЛДЫҚ САҚТАУ МЕРЗІМІ' : 'REMAINING SHELF LIFE'}</span>
               </span>
               <span className="text-slate-300 font-mono">ARRHENIUS</span>
             </div>
             <div>
               <div className="text-xl sm:text-2xl font-black font-mono text-cyan-300 tracking-tight">
-                {calculations.predictedRulHours} Hours
+                {calculations.predictedRulHours} {locale === 'ru' ? 'Часов' : locale === 'kz' ? 'Сағат' : 'Hours'}
               </div>
               <div className="text-xs text-slate-400 font-mono mt-0.5">
-                Approx. {calculations.predictedRulDays} Days remaining quality
+                {locale === 'ru' ? `Прибл. ${calculations.predictedRulDays} дн. запаса качества` : locale === 'kz' ? `Шамамен ${calculations.predictedRulDays} күн сапа қоры` : `Approx. ${calculations.predictedRulDays} Days remaining quality`}
               </div>
             </div>
           </div>
@@ -438,10 +442,10 @@ export default function DemoPage() {
               <div className="flex items-center justify-between">
                 <span className="text-xs font-mono font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
                   <Layers className="w-3.5 h-3.5 text-cyan-400" />
-                  <span>Select Active Transport Modality (5 Modes)</span>
+                  <span>{locale === 'ru' ? 'Выбор вида транспорта (5 режимов)' : locale === 'kz' ? 'Көлік түрін таңдау (5 режим)' : 'Select Active Transport Modality (5 Modes)'}</span>
                 </span>
                 <span className="text-[11px] font-mono text-cyan-400 font-semibold">
-                  Camera: Auto-Fit Corridor
+                  {locale === 'ru' ? 'Камера: автоцентрирование' : locale === 'kz' ? 'Камера: автоматты реттеу' : 'Camera: Auto-Fit Corridor'}
                 </span>
               </div>
 
@@ -507,7 +511,7 @@ export default function DemoPage() {
                   }`}
                 >
                   {isPlaying ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
-                  <span>{isPlaying ? 'Pause' : 'Traverse Track'}</span>
+                  <span>{isPlaying ? (locale === 'ru' ? 'Пауза' : locale === 'kz' ? 'Кідірту' : 'Pause') : (locale === 'ru' ? 'Анимация пути' : locale === 'kz' ? 'Жол қозғалысы' : 'Traverse Track')}</span>
                 </button>
 
                 {/* Speed Multiplier */}
@@ -545,7 +549,7 @@ export default function DemoPage() {
               <div className="flex items-center justify-between">
                 <span className="text-xs font-mono font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
                   <Box className="w-3.5 h-3.5 text-emerald-400" />
-                  <span>Perishable Commodity Profile</span>
+                  <span>{locale === 'ru' ? 'Профиль скоропортящегося агроактива' : locale === 'kz' ? 'Тез бұзылатын агроактив бейіні' : 'Perishable Commodity Profile'}</span>
                 </span>
                 <Badge variant="mint" size="sm">
                   {COMMODITY_KINETIC_PROFILES[conditionTelemetry.commodity].eaKjMol} kJ/mol Ea
@@ -590,7 +594,7 @@ export default function DemoPage() {
               <div className="flex items-center justify-between">
                 <span className="text-xs font-mono font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
                   <Thermometer className="w-3.5 h-3.5 text-cyan-400" />
-                  <span>Dual Temperature & Excursion</span>
+                  <span>{locale === 'ru' ? 'Двойной контроль температуры и дрейф' : locale === 'kz' ? 'Қос температуралық бақылау және ауытқу' : 'Dual Temperature & Excursion'}</span>
                 </span>
                 <span className="text-xs font-mono font-bold text-cyan-300">
                   ΔT = {calculations.thermalDelta > 0 ? `+${calculations.thermalDelta}` : calculations.thermalDelta}°C
@@ -600,7 +604,7 @@ export default function DemoPage() {
               {/* Slider 1: Target Setpoint (T_set) */}
               <div className="flex flex-col gap-1.5 p-3 rounded-xl bg-slate-950/70 border border-slate-800/80">
                 <div className="flex items-center justify-between text-xs">
-                  <span className="text-slate-300 font-medium">Reefer Setpoint (T_set)</span>
+                  <span className="text-slate-300 font-medium">{locale === "ru" ? "Уставка рефрижератора (T_set)" : locale === "kz" ? "Рефрижератор межесі (T_set)" : "Reefer Setpoint (T_set)"}</span>
                   <span className="font-mono font-bold text-cyan-300">
                     {conditionTelemetry.setPointCelsius > 0 ? `+${conditionTelemetry.setPointCelsius.toFixed(1)}` : conditionTelemetry.setPointCelsius.toFixed(1)}°C
                   </span>
@@ -793,10 +797,10 @@ export default function DemoPage() {
               <div className="flex items-center justify-between">
                 <span className="text-xs font-mono font-bold uppercase tracking-wider flex items-center gap-1.5 text-white">
                   <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
-                  <span>AI Conductor Biological Prescription</span>
+                  <span>{locale === 'ru' ? 'Биологическое предписание AI-проводника' : locale === 'kz' ? 'AI бағыттаушысының биологиялық нұсқауы' : 'AI Conductor Biological Prescription'}</span>
                 </span>
                 <span className="text-xs font-mono font-bold text-emerald-400">
-                  Saved: ${calculations.savedValueUsd.toLocaleString()}
+                  {locale === 'ru' ? 'Спасено:' : locale === 'kz' ? 'Құтқарылды:' : 'Saved:'} ${calculations.savedValueUsd.toLocaleString()}
                 </span>
               </div>
 
@@ -811,7 +815,7 @@ export default function DemoPage() {
 
               <div className="p-3 rounded-xl bg-slate-950/80 border border-slate-800 text-xs">
                 <span className="text-[10px] font-mono font-bold text-cyan-400 uppercase tracking-wider block mb-1">
-                  Actionable Intervention Protocol:
+                  {locale === 'ru' ? 'Протокол немедленного вмешательства:' : locale === 'kz' ? 'Шұғыл араласу хаттамасы:' : 'Actionable Intervention Protocol:'}
                 </span>
                 <p className="text-slate-200 leading-relaxed font-sans">
                   {calculations.prescribedIntervention}
@@ -823,7 +827,7 @@ export default function DemoPage() {
             <div className="p-4 rounded-2xl bg-slate-900/80 border border-slate-800 flex flex-col gap-2.5">
               <span className="text-xs font-mono font-bold text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
                 <Zap className="w-3.5 h-3.5 text-amber-400" />
-                <span>Simulate Real Middle Corridor Scenarios</span>
+                <span>{locale === 'ru' ? 'Сценарии инцидентов на Срединном коридоре' : locale === 'kz' ? 'Орта дәліздегі нақты сценарийлерді модельдеу' : 'Simulate Real Middle Corridor Scenarios'}</span>
               </span>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs font-medium">

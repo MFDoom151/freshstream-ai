@@ -68,7 +68,7 @@ export default function DashboardPage() {
             </div>
             <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-950/30 border border-purple-800/40 text-xs font-mono text-purple-300">
               <Activity className="w-3.5 h-3.5 text-purple-400" />
-              <span>Bio-Twin Active</span>
+              <span>{t('dashboard.bio_twin_badge')}</span>
             </div>
           </div>
         </div>
@@ -84,23 +84,23 @@ export default function DashboardPage() {
             <div>
               <div className="flex items-center gap-2">
                 <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
-                  Trans-Caspian Bio-Digital Twin Command Canvas
+                  {t('dashboard.gis_title')}
                 </h2>
                 <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
-                  REAL GIS TELEMETRY
+                  {t('dashboard.gis_badge')}
                 </span>
               </div>
               <p className="text-xs sm:text-sm text-slate-400 mt-0.5">
-                Active reefer rail & ro-pax vessels, critical temperature excursions, and bio-degradation events plotted over real geospatial terrain.
+                {t('dashboard.gis_sub')}
               </p>
             </div>
 
             <Link
               href="/demo"
-              className="self-start sm:self-center px-3.5 py-2 rounded-xl bg-slate-900/90 hover:bg-slate-800 border border-slate-700/80 hover:border-cyan-400/80 text-xs font-mono font-bold text-cyan-300 hover:text-white flex items-center gap-2 transition-all shadow-sm shrink-0 cursor-pointer"
+              className="self-start sm:sm:self-center px-3.5 py-2 rounded-xl bg-slate-900/90 hover:bg-slate-800 border border-slate-700/80 hover:border-cyan-400/80 text-xs font-mono font-bold text-cyan-300 hover:text-white flex items-center gap-2 transition-all shadow-sm shrink-0 cursor-pointer"
             >
               <Activity className="w-3.5 h-3.5 text-cyan-400" />
-              <span>Full Mission Control Simulator</span>
+              <span>{t('dashboard.gis_btn_demo')}</span>
               <ArrowUpRight className="w-3.5 h-3.5 text-cyan-400" />
             </Link>
           </div>
