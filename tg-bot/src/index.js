@@ -9,7 +9,8 @@ import { BackendMonitor } from './monitor.js';
 
 const token = process.env.TELEGRAM_BOT_TOKEN;
 const chatId = process.env.TELEGRAM_CHAT_ID;
-const baseUrl = process.env.BACKEND_URL || 'http://localhost:3000';
+// Prioritize bound Vercel service URL (APP_URL), falling back to BACKEND_URL or local dev
+const baseUrl = process.env.APP_URL || process.env.BACKEND_URL || 'http://localhost:3000';
 const cooldownSeconds = parseInt(process.env.COOLDOWN_SECONDS || '300', 10);
 const pollIntervalMs = parseInt(process.env.POLL_INTERVAL_MS || '5000', 10);
 

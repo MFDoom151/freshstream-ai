@@ -28,7 +28,7 @@ export class BackendMonitor {
    * Start Server-Sent Events listener
    */
   async startSSE() {
-    const sseUrl = `${this.baseUrl}/api/telemetry/stream`;
+    const sseUrl = new URL('/api/telemetry/stream', this.baseUrl).toString();
     try {
       this.abortController = new AbortController();
       const response = await fetch(sseUrl, {
@@ -126,7 +126,8 @@ export class BackendMonitor {
   startPolling() {
     const poll = async () => {
       try {
-        const res = await fetch(`${this.baseUrl}/api/alerts?limit=10`);
+        const alertsUrl = new URL('/api/alerts?limit=10', this.baseUrl).toString();
+        const res = await fetch(alertsUrl);
         if (res.ok) {
           const json = await res.json();
           const alerts = json.alerts || [];

@@ -19,7 +19,7 @@ const args = process.argv.slice(2);
 const config = {
   shipmentId: 'FS-8821',
   intervalMs: 2000,
-  baseUrl: process.env.BACKEND_URL || 'http://localhost:3000',
+  baseUrl: process.env.APP_URL || process.env.BACKEND_URL || 'http://localhost:3000',
   loop: true,
   startIndex: 0,
   verbose: true,
