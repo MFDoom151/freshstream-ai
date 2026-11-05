@@ -51,10 +51,33 @@ export const Header: React.FC = () => {
     };
   }, [mobileMenuOpen]);
 
-  const navLinks = [
-    { href: '/demo', label: t('nav.demo') || 'Mission Control', badge: 'GIS' },
+  const navLabels = {
+    en: {
+      map: 'Corridor Map',
+      sensors: 'IoT Sensors',
+      cargo: 'Cargo Kinetics',
+    },
+    ru: {
+      map: 'Карта коридора',
+      sensors: 'Датчики IoT',
+      cargo: 'Матрица грузов',
+    },
+    kz: {
+      map: 'Дәліз картасы',
+      sensors: 'IoT датчиктері',
+      cargo: 'Жүк матрицасы',
+    },
+  }[locale] || {
+    map: 'Corridor Map',
+    sensors: 'IoT Sensors',
+    cargo: 'Cargo Kinetics',
+  };
+
+  const navLinks: Array<{ href: string; label: string; badge?: string; isLive?: boolean }> = [
+    { href: '/#corridor-map', label: navLabels.map, badge: 'GIS' },
+    { href: '/#iot-sensors', label: navLabels.sensors, badge: 'ISO' },
+    { href: '/#cargo-matrix', label: navLabels.cargo },
     { href: '/dashboard', label: t('nav.dashboard') || 'Dashboard', isLive: true },
-    { href: '/dashboard#shipments', label: t('nav.shipments') || 'Shipments' },
     { href: '/dashboard/analytics', label: t('nav.analytics') || 'Analytics' },
     { href: '/dashboard/support', label: t('nav.support') || 'Support' },
   ];

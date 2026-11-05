@@ -96,7 +96,7 @@ export default function DashboardPage() {
             </div>
 
             <Link
-              href="/demo"
+              href="/#corridor-map"
               className="self-start sm:sm:self-center px-3.5 py-2 rounded-xl bg-slate-900/90 hover:bg-slate-800 border border-slate-700/80 hover:border-cyan-400/80 text-xs font-mono font-bold text-cyan-300 hover:text-white flex items-center gap-2 transition-all shadow-sm shrink-0 cursor-pointer"
             >
               <Activity className="w-3.5 h-3.5 text-cyan-400" />

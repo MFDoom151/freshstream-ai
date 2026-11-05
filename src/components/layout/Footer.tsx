@@ -8,7 +8,28 @@ import { Badge } from '@/components/ui/Badge';
 import { useI18n } from '@/lib/i18n/context';
 
 export const Footer: React.FC = () => {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
+  const pillarLabels = {
+    en: {
+      map: 'TITR Corridor Map',
+      sensors: 'Reefer & IoT Blueprint',
+      cargo: 'Arrhenius Cargo Matrix',
+    },
+    ru: {
+      map: 'Карта Среднего коридора',
+      sensors: 'Схема рефрижератора и IoT',
+      cargo: 'Матрица грузов Аррениуса',
+    },
+    kz: {
+      map: 'Орта дәліз картасы',
+      sensors: 'Рефрижератор мен IoT сызбасы',
+      cargo: 'Аррениус жүк матрицасы',
+    },
+  }[locale] || {
+    map: 'TITR Corridor Map',
+    sensors: 'Reefer & IoT Blueprint',
+    cargo: 'Arrhenius Cargo Matrix',
+  };
 
   return (
     <footer className="mt-auto border-t border-slate-800/80 bg-slate-950/90 dark:bg-slate-950/90 light:bg-slate-50/90 text-slate-400 text-sm transition-colors duration-300">
@@ -50,9 +71,20 @@ export const Footer: React.FC = () => {
                 </Link>
               </li>
               <li>
-                <Link href="/demo" className="hover:text-emerald-400 transition-colors flex items-center gap-1.5">
-                  <span>{t('nav.demo') || 'Mission Control Simulator'}</span>
+                <Link href="/#corridor-map" className="hover:text-emerald-400 transition-colors flex items-center gap-1.5">
+                  <span>{pillarLabels.map}</span>
                   <Badge variant="mint" size="sm">GIS</Badge>
+                </Link>
+              </li>
+              <li>
+                <Link href="/#iot-sensors" className="hover:text-emerald-400 transition-colors flex items-center gap-1.5">
+                  <span>{pillarLabels.sensors}</span>
+                  <Badge variant="mint" size="sm">ISO</Badge>
+                </Link>
+              </li>
+              <li>
+                <Link href="/#cargo-matrix" className="hover:text-emerald-400 transition-colors">
+                  {pillarLabels.cargo}
                 </Link>
               </li>
               <li>

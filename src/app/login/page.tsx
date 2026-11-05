@@ -211,13 +211,13 @@ function LoginForm() {
               </div>
             </div>
 
-            {/* Quick Link to Public Demo without sign-in */}
+            {/* Quick Link to Public Dashboard without sign-in */}
             <div className="mt-5 pt-4 border-t border-slate-100 dark:border-slate-800/80 text-center">
               <Link
-                href="/demo"
+                href="/#corridor-map"
                 className="text-xs text-slate-600 hover:text-cyan-600 dark:text-slate-400 dark:hover:text-cyan-300 font-medium transition-colors inline-flex items-center gap-1.5"
               >
-                <span>Explore Interactive Mission Control Demo without sign-in</span>
+                <span>Return to Trans-Caspian Corridor Architecture</span>
                 <ArrowRight className="w-3.5 h-3.5 text-cyan-500" />
               </Link>
             </div>
